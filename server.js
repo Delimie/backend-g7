@@ -9,11 +9,7 @@ import { Server } from 'socket.io';
 import { createServer, http } from 'http';
 import createError from "./src/utils/create-error.js";
 import prisma from "./src/config/prisma.config.js";
-
-import { Server } from 'socket.io';
-import { createServer, http } from 'http';
-import createError from "./src/utils/create-error.js";
-import prisma from "./src/config/prisma.config.js";
+import app from "./app.js";
 
 dotenv.config()
 
