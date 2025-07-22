@@ -46,4 +46,4 @@ io.use(async (socket, next) => {
 
 httpServer.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`)
-})
+});
