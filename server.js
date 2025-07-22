@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-import app from "./app.js";
-import dotenv from "dotenv";
-=======
 import express from "express";
 import cors from "cors";
 import authRouter from "./src/routes/auth.route.js";
@@ -13,7 +9,6 @@ import { Server } from 'socket.io';
 import { createServer, http } from 'http';
 import createError from "./src/utils/create-error.js";
 import prisma from "./src/config/prisma.config.js";
->>>>>>> Stashed changes
 
 dotenv.config()
 
