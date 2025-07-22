@@ -15,14 +15,119 @@ datasource db {
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
+  id           Int               @id @default(autoincrement())
   name         String
-  // userName     String   @unique
-  email        String   @unique
+  email        String            @unique
   password     String
-  mobile       String   @unique
+  mobile       String            @unique
+  birthDate    DateTime          @db.DateTime()
+  gender       String
+  occupation   String
+  address      String?
   profileImage String?
   coverImage   String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt @db.Timestamp(0)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt @db.Timestamp(0)
+  group        GroupUser[]
+  expenseSplit ExpenseSplit[]
+  payer        DebtTransaction[] @relation("payer")
+  receiver     DebtTransaction[] @relation("receiver")
+}
+
+model Group {
+  id        Int         @id @default(autoincrement())
+  name      String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt @db.Timestamp(0)
+  user      GroupUser[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model GroupUser {
+  id          Int                    @id @default(autoincrement())
+  role        Role                   @default(USER)
+  user        User                   @relation(fields: [userId], references: [id])
+  userId      Int
+  group       Group                  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId     Int
+  expense     Expense[]
+  appointment GroupUserAppointment[]
+}
+
+enum Identity {
+  INPROGRESS
+  COMPLETE
+}
+
+model Expense {
+  id           Int            @id @default(autoincrement())
+  title        String
+  amount       Float
+  receiptImage String
+  identity     Identity       @default(INPROGRESS)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt @db.Timestamp(0)
+  groupUser    GroupUser      @relation(fields: [groupUserId], references: [id], onDelete: Cascade)
+  groupUserId  Int
+  expenseSplit ExpenseSplit[]
+}
+
+enum Status {
+  UNPAID
+  PAID
+}
+
+model ExpenseSplit {
+  id        Int     @id @default(autoincrement())
+  amount    Float
+  status    Status  @default(UNPAID)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  expense   Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  expenseId Int
+}
+
+model Appointment {
+  id         Int                    @id @default(autoincrement())
+  title      String
+  point      String?
+  startTime  DateTime
+  endTime    DateTime
+  groupUser  GroupUserAppointment[]
+  location   Location               @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  locationId Int
+}
+
+model GroupUserAppointment {
+  id            Int         @id @default(autoincrement())
+  groupUser     GroupUser   @relation(fields: [groupUserId], references: [id], onDelete: Cascade)
+  groupUserId   Int
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  appointmentId Int
+}
+
+model Location {
+  id          Int           @id @default(autoincrement())
+  lat         Float
+  lng         Float
+  title       String
+  appointment Appointment[]
+}
+
+model DebtTransaction {
+  id         Int      @id @default(autoincrement())
+  amount     Float
+  identity   Identity
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt @db.Timestamp(0)
+  slip       String
+  note       String
+  payer      User     @relation("payer", fields: [payerId], references: [id])
+  payerId    Int
+  receiver   User     @relation("receiver", fields: [receiverId], references: [id])
+  receiverId Int
 }
