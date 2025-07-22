@@ -13,7 +13,7 @@ splitsRouter.post('/', (req, res) => {
 })
 
 // Update a specific split (optional)
-splitsRouter.patch('/id', (req, res) => {
+splitsRouter.patch('/:splitId', (req, res) => {
   res.send(`Update split ID: ${req.params.splitId} in expense ID: ${req.params.id}`)
 })
 
