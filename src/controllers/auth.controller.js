@@ -62,7 +62,7 @@ export const login = async (req, res, next) => {
       expiresIn: "30d"
     })
 
-    const { password: pw, createdAt, updatedAt, ...userData } = foundUser
+    const { password: pw, createdAt, updatedAt, profileImage, coverImage, ...userData } = foundUser
     res.json({ message: "Login successful", token: token, user: userData })
   } catch (error) {
     next(error)
