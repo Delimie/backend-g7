@@ -25,7 +25,7 @@ export const register = async (req, res, next) => {
         email: email,
         password: hashPassword,
         mobile: mobile,
-        birthDate: birthDate,
+        birthDate: new Date(birthDate),
         gender: gender,
         occupation: occupation,
         address: address

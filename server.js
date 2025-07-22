@@ -1,18 +1,9 @@
-import express from "express";
-import cors from "cors";
-import authRouter from "./src/routes/auth.route.js";
-import notFound from "./src/utils/not-found.js";
-import error from "./src/utils/error.js";
+import app from "./app.js";
+import dotenv from "dotenv";
 
-const app = express();
-const PORT = 8000;
-app.use(express.json());
-app.use(cors());
+dotenv.config()
 
-app.use('/auth', authRouter)
-
-app.use(notFound)
-app.use(error)
+const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`)
