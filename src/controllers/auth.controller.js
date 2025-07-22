@@ -5,7 +5,7 @@ import createError from "../utils/create-error.js";
 
 export const register = async (req, res, next) => {
   try {
-    const { name, email, password, mobile, profileImage, coverImage } = req.body
+    const { name, email, password, mobile, birthDate, gender, occupation, address, profileImage, coverImage } = req.body
     if (email) {
       let foundEmail = await prisma.user.findUnique({
         where: { email: email }
@@ -25,6 +25,10 @@ export const register = async (req, res, next) => {
         email: email,
         password: hashPassword,
         mobile: mobile,
+        birthDate: new Date(birthDate),
+        gender: gender,
+        occupation: occupation,
+        address: address
       }
     })
     console.log(result)
