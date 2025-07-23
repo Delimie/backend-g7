@@ -14,10 +14,6 @@ export const socketMiddleware = async (socket, next) => {
         id: payload.id
       },
       omit : {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 94a266b (Add createSocketError, fix omit prisma, successful connection to client side)
         password : true,
         profileImage : true,
         coverImage : true,
@@ -25,18 +21,6 @@ export const socketMiddleware = async (socket, next) => {
         address : true,
         createdAt : true,
         updatedAt : true,
-<<<<<<< HEAD
-=======
-        password,
-        profileImage,
-        coverImage,
-        occupation,
-        address,
-        createdAt,
-        updatedAt,
->>>>>>> 0227a74 (add socket disconnection event)
-=======
->>>>>>> 94a266b (Add createSocketError, fix omit prisma, successful connection to client side)
       }
     });
 
