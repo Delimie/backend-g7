@@ -6,7 +6,6 @@ export const socketMiddleware = async (socket, next) => {
   const token = socket.handshake.auth.token;
   if (!token) {
     return next(createSocketError(401,`Token is missing`));
-    return next(createSocketError(401,`Token is missing`));
   }
   try {
     const payload = jwt.verify(token, process.env.SECRET, { algorithms: ['HS256'] });
