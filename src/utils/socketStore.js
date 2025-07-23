@@ -1,0 +1,1 @@
+// For redis or db store data for socket
