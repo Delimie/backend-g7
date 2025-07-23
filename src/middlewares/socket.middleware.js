@@ -8,10 +8,19 @@ export const socketMiddleware = async (socket, next) => {
     return createError(null, 'Token is missing')
   }
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const payload = jwt.verify(token, process.env.SECRET, { algorithms: ['HS256'] });
     const user = await prisma.user.findUnique({
       where: {
         id: payload.id
+      },
+      omit : {
+        password,
+        profileImage,
+        coverImage,
+        occupation,
+        address,
+        createdAt,
+        updatedAt,
       }
     });
 
