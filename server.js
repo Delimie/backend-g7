@@ -2,9 +2,7 @@ import dotenv from 'dotenv';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
 import app from "./app.js";
-<<<<<<< HEAD
 import registerSocketRoute from './src/socket/webSocket.js';
->>>>>>> 07338de (add socket.on uesrtyping event, refactor socket folder structure separate handlers and event)
 
 dotenv.config()
 
