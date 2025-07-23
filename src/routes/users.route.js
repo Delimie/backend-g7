@@ -1,21 +1,16 @@
 import express from "express";
+import { getMe, getUserById, listUser, removeUser, updateUser } from "../controllers/user.controller.js";
 
 const userRouter = express.Router();
 
-userRouter.get('/', (req, res) => {
-  res.send('test get all users')
-})
-userRouter.patch('/:id', (req, res) => {
-  res.send('test patch users')
-})
-userRouter.delete('/:id', (req, res) => {
-  res.send('test delete users')
-})
-userRouter.get('/:id', (req, res) => {
-  res.send('test get users id')
-})
+userRouter.get('/', listUser)
+userRouter.patch('/:id', updateUser)
+userRouter.delete('/:id', removeUser)
+userRouter.get('/:id', getUserById)
 userRouter.get('/:id/balance', (req, res) => {
   res.send(`Get balance for user ID: ${req.params.id}`)
 })
+
+userRouter.get('/getme', getMe)
 
 export default userRouter;

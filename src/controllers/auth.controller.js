@@ -41,11 +41,19 @@ export const register = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { identity, email, mobile, password } = req.body
+    // console.log(req.body)
     const identityKey = email ? 'email' : 'mobile'
-    console.log(identityKey)
+    // console.log(identityKey)
+    // const identityValue = identity ? identity : email ? email : mobile
     const foundUser = await prisma.user.findFirst({
-      where: {[identityKey] : identity}
-      })
+      where: {
+        [identityKey]: email ? email : mobile
+        // OR: [
+        //   { email: identity },
+        //   { mobile: identity }
+        // ]
+      }
+    })
     if (!foundUser) createError(401, 'Invalid Login')
 
     const checkPassword = bcrypt.compareSync(password, foundUser.password)

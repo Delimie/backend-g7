@@ -19,10 +19,10 @@ model User {
   name         String
   email        String            @unique
   password     String
-  mobile       String            @unique
+  mobile       String?           @unique
   birthDate    DateTime          @db.DateTime()
   gender       String
-  occupation   String
+  occupation   String?
   address      String?
   profileImage String?
   coverImage   String?

@@ -17,9 +17,9 @@ export const registerSchema = object({
   password: string().min(6).required(),
   confirmPassword: string().oneOf([ref("password")], 'confirmPassword must match password'),
   email: string().email(),
-  mobile: string().matches(thaiMobileRegex),
+  mobile: string().matches(thaiMobileRegex, 'Invalid Mobile'),
   birthDate: date().required('Enter your birth date').max(new Date(), 'Birth date must not be in the future'),
-  gender: string().oneOf(['men', 'women', 'others'], 'Gender must be either "men" or "women" or "others'),
+  gender: string().oneOf(['men', 'women', 'others'], 'Gender must be either "men" or "women" or "others"'),
   occupation: string().required('Enter your occupation'),
   address: string().required('Enter your province')
 }).noUnknown()
@@ -50,8 +50,12 @@ export const loginSchema = object({
   ),
   password: string().min(6).required(),
   email: string().email(),
-  mobile: string().matches(thaiMobileRegex)
+  mobile: string().matches(thaiMobileRegex, 'Invalid Mobile')
 }).transform(value => {
+  if (value.email || value.mobile) {
+    delete value.identity
+    return value
+  }
   return ({ ...value, [emailRegex.test(value.identity) ? 'email' : 'mobile']: value.identity })
 }).noUnknown()
 
