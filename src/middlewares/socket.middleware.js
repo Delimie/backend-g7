@@ -1,11 +1,11 @@
 import prisma from "../config/prisma.config.js";
-import createError from "../utils/create-error.js";
 import jwt from 'jsonwebtoken';
+import createSocketError from "../utils/create-error-socket.js";
 
 export const socketMiddleware = async (socket, next) => {
   const token = socket.handshake.auth.token;
   if (!token) {
-    return createError(null, 'Token is missing')
+    return next(createSocketError(401,`Token is missing`));
   }
   try {
     const payload = jwt.verify(token, process.env.SECRET, { algorithms: ['HS256'] });
@@ -14,21 +14,22 @@ export const socketMiddleware = async (socket, next) => {
         id: payload.id
       },
       omit : {
-        password,
-        profileImage,
-        coverImage,
-        occupation,
-        address,
-        createdAt,
-        updatedAt,
+        password : true,
+        profileImage : true,
+        coverImage : true,
+        occupation : true,
+        address : true,
+        createdAt : true,
+        updatedAt : true,
       }
     });
 
-    if (!user) createError(null, `User doesn't exist`);
+    if (!user) next(createSocketError(400,`User doesn't exist`));
 
     socket.user = user;
     next();
   } catch (error) {
+    console.log(error);
     next(error);
   }
 }
