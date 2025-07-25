@@ -24,8 +24,7 @@ model User {
   gender       String
   occupation   String?
   address      String?
-  profileImage String?
-  coverImage   String?
+  profileImage String            @default("https://img2.pic.in.th/pic/profilegroup.png")
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt @db.Timestamp(0)
   group        GroupUser[]
@@ -35,11 +34,12 @@ model User {
 }
 
 model Group {
-  id        Int         @id @default(autoincrement())
-  name      String      @unique
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt @db.Timestamp(0)
-  user      GroupUser[]
+  id              Int               @id @default(autoincrement())
+  name            String            @unique
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt @db.Timestamp(0)
+  user            GroupUser[]
+  debtTransaction DebtTransaction[]
 }
 
 enum Role {
@@ -68,7 +68,7 @@ model Expense {
   title        String
   amount       Float
   receiptImage String
-  identity     Identity       @default(INPROGRESS)
+  status       Identity       @default(INPROGRESS)
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt @db.Timestamp(0)
   groupUser    GroupUser      @relation(fields: [groupUserId], references: [id], onDelete: Cascade)
@@ -82,13 +82,15 @@ enum Status {
 }
 
 model ExpenseSplit {
-  id        Int     @id @default(autoincrement())
-  amount    Float
-  status    Status  @default(UNPAID)
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
-  expense   Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
-  expenseId Int
+  id                Int              @id @default(autoincrement())
+  amount            Float
+  status            Status           @default(UNPAID)
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            Int
+  expense           Expense          @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  expenseId         Int
+  debtTransaction   DebtTransaction? @relation(fields: [debtTransactionId], references: [id])
+  debtTransactionId Int?
 }
 
 model Appointment {
@@ -119,15 +121,20 @@ model Location {
 }
 
 model DebtTransaction {
-  id         Int      @id @default(autoincrement())
-  amount     Float
-  identity   Identity
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt @db.Timestamp(0)
-  slip       String
-  note       String
-  payer      User     @relation("payer", fields: [payerId], references: [id])
-  payerId    Int
-  receiver   User     @relation("receiver", fields: [receiverId], references: [id])
-  receiverId Int
+  id           Int            @id @default(autoincrement())
+  amount       Float
+  identity     Identity
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt @db.Timestamp(0)
+  slip         String
+  note         String
+  status       Identity       @default(INPROGRESS)
+  payer        User           @relation("payer", fields: [payerId], references: [id])
+  payerId      Int
+  receiver     User           @relation("receiver", fields: [receiverId], references: [id])
+  receiverId   Int
+  expenseSplit ExpenseSplit[]
+  group        Group?         @relation(fields: [groupId], references: [id])
+  groupId      Int?
+  isConfirmed  Boolean        @default(false)
 }

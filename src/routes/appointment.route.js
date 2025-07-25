@@ -1,19 +1,12 @@
 import express from "express";
+import { createAppointment, listAppointment, removeAppointment, updateAppointment } from "../controllers/appointment.controller.js";
 
 const appointmentRouter = express.Router();
 
-appointmentRouter.post('/', (req, res) => {
-  res.send('test create appointment')
-})
-appointmentRouter.get('/', (req, res) => {
-  res.send('test get all appointment')
-})
-appointmentRouter.patch('/:id', (req, res) => {
-  res.send('test edit appointment')
-})
-appointmentRouter.delete('/:id', (req, res) => {
-  res.send('test delete appointment')
-})
+appointmentRouter.post('/', createAppointment)
+appointmentRouter.get('/', listAppointment)
+appointmentRouter.patch('/:id', updateAppointment)
+appointmentRouter.delete('/:id', removeAppointment)
 appointmentRouter.post('/:id/invite', (req, res) => {
   res.send('test invite appointment')
 })
