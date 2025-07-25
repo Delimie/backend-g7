@@ -6,6 +6,11 @@ export const CHAT_EVENT = {
   CHAT_ERROR: 'chatError',
 }
 
+export const STATUS = {
+  ACTIVE : true,
+  INACTIVE : false,
+}
+
 // Use for emit action
 export const CHAT_ACTION = {
   CHAT_SEND: 'chat:message',
