@@ -1,10 +1,15 @@
+<<<<<<< HEAD
 import prisma from "../../config/prisma.config.js";
 import { CHAT_ACTION, CHAT_EVENT, NOTI_ACTION, STATUS } from "../../shared/constants/socket.constant.js";
+=======
+import { CHAT_ACTION, STATUS } from "../../shared/constants/socket.constant.js";
+>>>>>>> 07338de (add socket.on uesrtyping event, refactor socket folder structure separate handlers and event)
 import { userTyping } from "../socket-events/chat.event.js";
 
 export const chatHandler = (io, socket) => {
 
   // Listen to user typing status
+<<<<<<< HEAD
   socket.on(CHAT_ACTION.CHAT_TYPING, (data) => userTyping(io, socket, data));
 
   // Listen to user sending message and if attached file with it
@@ -47,4 +52,8 @@ export const chatHandler = (io, socket) => {
   });
 
 
+=======
+  socket.on(CHAT_ACTION.CHAT_TYPING, (data) => userTyping(io,socket,data));
+  
+>>>>>>> 07338de (add socket.on uesrtyping event, refactor socket folder structure separate handlers and event)
 };

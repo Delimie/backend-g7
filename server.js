@@ -4,6 +4,7 @@ import { createServer } from 'http';
 import app from "./app.js";
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import registerSocketRoute from './src/socket/webSocket.js';
 =======
 import registerSocketRoute from './webSocket.js';
@@ -11,6 +12,9 @@ import registerSocketRoute from './webSocket.js';
 =======
 import registerSocketRoute from './src/socket/webSocket.js';
 >>>>>>> 6962f8e (Clean up git)
+=======
+import registerSocketRoute from './src/socket/webSocket.js';
+>>>>>>> 07338de (add socket.on uesrtyping event, refactor socket folder structure separate handlers and event)
 
 dotenv.config()
 
