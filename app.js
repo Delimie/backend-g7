@@ -11,8 +11,10 @@ import locationsRouter from './src/routes/locations.route.js'
 import debtTransactionRouter from "./src/routes/debtTransaction.route.js";
 
 const app = express()
+
 app.use(cors())
 app.use(express.json())
+
 
 app.use('/auth', authRouter)
 app.use('/groups', groupRouter)
