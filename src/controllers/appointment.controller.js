@@ -33,3 +33,34 @@ export const listAppointment = async (req, res, next) => {
     next(error)
   }
 }
+
+export const updateAppointment = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const { title, point, startTime, endTime } = req.body
+    const appointment = await prisma.appointment.update({
+      where: { id: Number(id) },
+      data: {
+        title: title,
+        point: Number(point),
+        startTime: new Date(startTime),
+        endTime: new Date(endTime)
+      }
+    })
+    res.json({ result: appointment })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const removeAppointment = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const appointment = await prisma.appointment.delete({
+      where: { id: Number(id) }
+    })
+    res.json({ message: 'Delete successfully', result: appointment })
+  } catch (error) {
+    next(error)
+  }
+}

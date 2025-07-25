@@ -1,20 +1,17 @@
 import express from 'express'
+import { createExpenseSplits, listExpenseSplits, removeExpenseSplit, updateExpenseSplit } from '../controllers/splits.controller.js'
 
 const splitsRouter = express.Router({ mergeParams: true })
 
 // Get splits for an expense
-splitsRouter.get('/', (req, res) => {
-  res.send(`Get splits for expense ID: ${req.params.id}`)
-})
+splitsRouter.get('/', listExpenseSplits)
 
 // Create new splits
-splitsRouter.post('/', (req, res) => {
-  res.send(`Create splits for expense ID: ${req.params.id}`)
-})
+splitsRouter.post('/', createExpenseSplits)
 
 // Update a specific split (optional)
-splitsRouter.patch('/:splitId', (req, res) => {
-  res.send(`Update split ID: ${req.params.splitId} in expense ID: ${req.params.id}`)
-})
+splitsRouter.patch('/:splitId', updateExpenseSplit)
+
+splitsRouter.delete('/:splitId', removeExpenseSplit)
 
 export default splitsRouter
