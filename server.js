@@ -2,8 +2,7 @@ import dotenv from 'dotenv';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
 import app from "./app.js";
-import registerSocketRoute from './webSocket.js';
-import error from './src/utils/error.js';
+import registerSocketRoute from './src/socket/webSocket.js';
 
 dotenv.config()
 

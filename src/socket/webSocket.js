@@ -1,5 +1,6 @@
-import { socketMiddleware } from "./src/middlewares/socket.middleware.js";
-import { CHAT_ACTION } from "./src/shared/constants/socket.constant.js";
+import { socketMiddleware } from "../middlewares/socket.middleware.js";
+import { CHAT_ACTION } from "../shared/constants/socket.constant.js";
+import { chatHandler } from "./socket-handlers/chat.handler.js";
 
 const registerSocketRoute = (io) => {
   io.use(socketMiddleware).on('connection', (socket) => {
@@ -8,11 +9,7 @@ const registerSocketRoute = (io) => {
     // Update user Online status
     socket.user.status = true;
 
-    socket.on('hello:server', () => {
-      console.log(`User has join the chat ${socket.user.name}`);
-
-      socket.emit(CHAT_ACTION.CHAT_SYNC, { message: `Hello ${socket.user.name} are now connect to chatroom` });
-    });
+    chatHandler(io,socket);
 
     socket.on('disconnect', (reason) => {
       console.log(`Socket id : ${socket.id} has disconnected reason : ${reason}`);
