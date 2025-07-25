@@ -8,6 +8,11 @@ const registerSocketRoute = (io) => {
     // Update user Online status
     socket.user.status = true;
 
+    socket.on('hello:server', () => {
+      console.log(`User has join the chat ${socket.user.name}`);
+
+      socket.emit(CHAT_ACTION.CHAT_SYNC, { message: `Hello ${socket.user.name} are now connect to chatroom` });
+    });
 
     socket.on('disconnect', (reason) => {
       console.log(`Socket id : ${socket.id} has disconnected reason : ${reason}`);
@@ -15,16 +20,13 @@ const registerSocketRoute = (io) => {
       // Update user Offline status
       socket.user.status = false;
 
-
-
       // Handle tell user has left the chatRoom
       socket.to('ROOMID').emit(CHAT_ACTION.LEAVE_CHAT, {
         message: `${socket.user.name} has left the group`,
-        useruserId: socket.user.name,
+        userId: socket.user.name,
       });
 
     });
-
 
   });
 }
