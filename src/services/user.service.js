@@ -1,6 +1,8 @@
 import prisma from '../config/prisma.config.js'
+import createError from '../utils/create-error.js'
 
 export const getMe = async (id) => {
+  if (!id) createError(404, 'User ID is required')
   return await prisma.user.findFirst({
     where: { id: Number(id) },
     select: {

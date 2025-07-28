@@ -2,6 +2,13 @@ import * as userService from '../services/user.service.js'
 
 export const getMe = async (req, res, next) => {
   try {
+    
+    // console.log('req.user in getMe:', req.user);
+
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: 'Unauthorized' })
+    }
+
     const result = await userService.getMe(req.user.id)
     res.json({ result })
   } catch (error) {

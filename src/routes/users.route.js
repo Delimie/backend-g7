@@ -4,6 +4,8 @@ import { authCheck } from "../middlewares/auth.middleware.js";
 
 const userRouter = express.Router();
 
+userRouter.get('/getme', authCheck, getMe)
+
 userRouter.get('/', authCheck, listUser)
 userRouter.patch('/:id', authCheck, updateUser)
 userRouter.delete('/:id', authCheck, removeUser)
@@ -12,6 +14,6 @@ userRouter.get('/:id/balance', (req, res) => {
   res.send(`Get balance for user ID: ${req.params.id}`)
 })
 
-userRouter.get('/getme', getMe)
+
 
 export default userRouter;
