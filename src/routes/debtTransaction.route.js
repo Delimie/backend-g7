@@ -2,16 +2,16 @@ import express from "express";
 
 const debtTransactionRouter = express.Router();
 
-debtTransactionRouter.post('/', (req, res) => {
+debtTransactionRouter.post('/groups/:groupId/debt-transactions', (req, res) => {
   res.send('test create transaction')
 })
-debtTransactionRouter.get('/:id', (req, res) => {
-  res.send('test get transaction')
+debtTransactionRouter.get('/groups/:groupId/debt-summary', (req, res) => {
+  res.send('test get preview transaction')
 })
-debtTransactionRouter.get('/user/:id', (req, res) => {
-  res.send('test get user transaction')
+debtTransactionRouter.get('/groups/:groupId/debt-transactions', (req, res) => {
+  res.send('test get group transaction')
 })
-debtTransactionRouter.patch('/:id/confirm', (req, res) => {
+debtTransactionRouter.patch('/debt-transactions/:id/confirm', (req, res) => {
   res.send('test confirm transaction')
 })
 
