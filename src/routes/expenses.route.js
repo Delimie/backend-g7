@@ -1,34 +1,16 @@
 import express from 'express'
+import * as expenseController from '../controllers/expense.controller.js'
 import splitsRouter from './splits.route.js'
+import { createExpenseSchema, updateExpenseSchema, validate } from '../validations/expense.validator.js'
 
 const expensesRouter = express.Router()
 
-// Create expense
-expensesRouter.post('/', (req, res) => {
-  res.send('Create new expense')
-})
+expensesRouter.post('/', validate(createExpenseSchema), expenseController.createExpense)
+expensesRouter.get('/:id', expenseController.getExpenseById)
+expensesRouter.patch('/:id', validate(updateExpenseSchema), expenseController.updateExpense)
+expensesRouter.delete('/:id', expenseController.deleteExpense)
+expensesRouter.get('/groups/:groupId/', expenseController.getExpensesByGroupId)
 
-// Get expense by ID
-expensesRouter.get('/:id', (req, res) => {
-  res.send(`Get expense with ID: ${req.params.id}`)
-})
-
-// Update expense
-expensesRouter.patch('/:id', (req, res) => {
-  res.send(`Update expense with ID: ${req.params.id}`)
-})
-
-// Delete expense
-expensesRouter.delete('/:id', (req, res) => {
-  res.send(`Delete expense with ID: ${req.params.id}`)
-})
-
-// Get all expenses in group
-expensesRouter.get('/groups/:groupId/expenses', (req, res) => {
-  res.send(`Get all expenses in group ID: ${req.params.groupId}`)
-})
-
-// Mount splitsRouter: /expenses/:id/splits
-expensesRouter.use('/:id/splits', splitsRouter)
+expensesRouter.use('/:expenseId/splits', splitsRouter)
 
 export default expensesRouter

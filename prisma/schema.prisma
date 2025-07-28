@@ -68,6 +68,7 @@ model Expense {
   title        String
   amount       Float
   receiptImage String
+  date         DateTime
   status       Identity       @default(INPROGRESS)
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt @db.Timestamp(0)

@@ -14,6 +14,7 @@ export const authCheck = (req, res, next) => {
       // console.log('decode', decode)
       if (error) createError(401, 'Token is invalid !')
       req.user = decode
+    // console.log('authCheck set req.user:', req.user)
       next()
     })
   } catch (error) {

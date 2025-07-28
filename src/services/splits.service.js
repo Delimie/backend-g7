@@ -8,10 +8,13 @@ export const listExpenseSplits = async () => {
 export const createExpenseSplits = async (expenseId, data) => {
   const { amount, status, userId } = data
 
+  const numericExpenseId = Number(expenseId)
+  if (isNaN(numericExpenseId)) createError(400, 'Invalid expenseId')
+
   const user = await prisma.user.findFirst({ where: { id: Number(userId) } })
   if (!user) throw createError(400, 'Not found user')
 
-  const expense = await prisma.expense.findFirst({ where: { id: expenseId } })
+  const expense = await prisma.expense.findFirst({ where: { id: numericExpenseId } })
   if (!expense) throw createError(400, 'Not found expense')
 
   return await prisma.expenseSplit.create({
@@ -19,7 +22,7 @@ export const createExpenseSplits = async (expenseId, data) => {
       userId: Number(userId),
       amount: Number(amount),
       status,
-      expenseId
+      expenseId: numericExpenseId
     }
   })
 }
