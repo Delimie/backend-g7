@@ -14,11 +14,6 @@ export const socketMiddleware = async (socket, next) => {
         id: payload.id
       },
       omit : {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> edb312f7602b17f888dd9dad5a2a411cd3cf9708
         password : true,
         profileImage : true,
         coverImage : true,
@@ -26,23 +21,6 @@ export const socketMiddleware = async (socket, next) => {
         address : true,
         createdAt : true,
         updatedAt : true,
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 1a3f9c9 (add socket disconnection event)
-        password,
-        profileImage,
-        coverImage,
-        occupation,
-        address,
-        createdAt,
-        updatedAt,
-<<<<<<< HEAD
->>>>>>> 6435de3 (add socket disconnection event)
-=======
->>>>>>> 1a3f9c9 (add socket disconnection event)
-=======
->>>>>>> edb312f7602b17f888dd9dad5a2a411cd3cf9708
       }
     });
 
