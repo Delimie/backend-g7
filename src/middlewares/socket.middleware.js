@@ -21,6 +21,16 @@ export const socketMiddleware = async (socket, next) => {
         address : true,
         createdAt : true,
         updatedAt : true,
+<<<<<<< HEAD
+=======
+        password,
+        profileImage,
+        coverImage,
+        occupation,
+        address,
+        createdAt,
+        updatedAt,
+>>>>>>> d6b490a (add disconnection event)
       }
     });
 
