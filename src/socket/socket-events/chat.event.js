@@ -8,14 +8,14 @@ export const userTyping = (io, socket, data, callback) => {
     if (status === STATUS.ACTIVE) {
       // console.log(`User : ${socket.user.name} is typing`);
 
-      socket.to('ROOMID').emit(CHAT_ACTION.CHAT_TYPING, {
+      socket.to('CHANNELID').emit(CHAT_ACTION.CHAT_TYPING, {
         userName: socket.user.name,
         status: status
       });
     }
 
     // console.log(`User : ${socket.user.name} is not typing`);
-    socket.to('ROOMID').emit(CHAT_ACTION.CHAT_TYPING, {
+    socket.to('CHANNELID').emit(CHAT_ACTION.CHAT_TYPING, {
       userName: socket.user.name,
       status: status
     });
