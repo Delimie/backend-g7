@@ -8,7 +8,14 @@ export const userTyping = (io, socket, data, callback) => {
   if (status === STATUS.ACTIVE) {
     // console.log(`User : ${socket.user.name} is typing`);
 
+    // Actual emit that has to happen
     socket.to('CHANNEL:ID').emit(CHAT_ACTION.CHAT_TYPING, {
+      userName: socket.user.name,
+      status: status
+    });
+
+    // For testing user is typing notification
+    socket.emit(CHAT_ACTION.CHAT_TYPING, {
       userName: socket.user.name,
       status: status
     });

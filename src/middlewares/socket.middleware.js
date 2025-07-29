@@ -16,7 +16,6 @@ export const socketMiddleware = async (socket, next) => {
       omit : {
         password : true,
         profileImage : true,
-        coverImage : true,
         occupation : true,
         address : true,
         createdAt : true,
