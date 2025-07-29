@@ -124,11 +124,11 @@ model Location {
 model DebtTransaction {
   id           Int            @id @default(autoincrement())
   amount       Float
-  identity     Identity
+  // identity     Identity
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt @db.Timestamp(0)
-  slip         String
-  note         String
+  slip         String?
+  note         String?
   status       Identity       @default(INPROGRESS)
   payer        User           @relation("payer", fields: [payerId], references: [id])
   payerId      Int

@@ -21,8 +21,8 @@ export const createExpenseSplits = async (req, res, next) => {
 
 export const updateExpenseSplit = async (req, res, next) => {
   try {
-    const { splitId, expenseId } = req.params
-    const result = await expenseSplitService.updateExpenseSplit(Number(splitId), Number(expenseId), req.body)
+    const { splitId } = req.params
+    const result = await expenseSplitService.updateExpenseSplit(Number(splitId), req.body)
     res.json({ result })
   } catch (error) {
     next(error)

@@ -7,7 +7,7 @@ const splitsRouter = express.Router({ mergeParams: true })
 splitsRouter.get('/', listExpenseSplits)
 
 // Create new splits
-splitsRouter.post('/', createExpenseSplits)
+splitsRouter.post('/expenses/:expenseId', createExpenseSplits)
 
 // Update a specific split (optional)
 splitsRouter.patch('/:splitId', updateExpenseSplit)
