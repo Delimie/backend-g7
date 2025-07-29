@@ -31,6 +31,11 @@ model User {
   expenseSplit ExpenseSplit[]
   payer        DebtTransaction[] @relation("payer")
   receiver     DebtTransaction[] @relation("receiver")
+
+  message Message[]
+
+  DMParticipant DMParticipant[]
+  DMMessage     DMMessage[]
 }
 
 model Group {
@@ -40,6 +45,7 @@ model Group {
   updatedAt       DateTime          @updatedAt @db.Timestamp(0)
   user            GroupUser[]
   debtTransaction DebtTransaction[]
+  channels        Channel[]
 }
 
 enum Role {
@@ -138,4 +144,76 @@ model DebtTransaction {
   group        Group?         @relation(fields: [groupId], references: [id])
   groupId      Int?
   isConfirmed  Boolean        @default(false)
+}
+
+// Group and Chat data model
+
+model Channel {
+  id        Int         @id @default(autoincrement())
+  name      String
+  type      ChannelType // 'TEXT' | 'VOICE' | 'PRIVATE'
+  messages  Message[]
+  createdAt DateTime    @default(now())
+  Group     Group?      @relation(fields: [groupId], references: [id])
+  groupId   Int?
+}
+
+model Message {
+  id Int @id @default(autoincrement())
+
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    Int?
+  content   String
+  createdAt DateTime @default(now())
+  channel   Channel  @relation(fields: [channelId], references: [id])
+  channelId Int
+
+  attachments Attachment[]
+}
+
+model Attachment {
+  id        Int    @id @default(autoincrement())
+  messageId Int
+  url       String // File URL
+  type      String // MIME type like "image/png", "video/mp4"
+  name      String // Original file name
+  size      Int // Optional: file size in bytes
+
+  message Message @relation(fields: [messageId], references: [id])
+}
+
+enum ChannelType {
+  TEXT
+  VOICE
+  PRIVATE
+}
+
+// DM chat
+model DMThread {
+  id           Int             @id @default(autoincrement())
+  createdAt    DateTime        @default(now())
+  participants DMParticipant[]
+  messages     DMMessage[]
+}
+
+model DMParticipant {
+  id       Int @id @default(autoincrement())
+  threadId Int
+  userId   Int
+
+  thread DMThread @relation(fields: [threadId], references: [id])
+  user   User     @relation(fields: [userId], references: [id])
+
+  @@unique([threadId, userId]) // No duplicates
+}
+
+model DMMessage {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  senderId  Int
+  threadId  Int
+
+  sender User     @relation(fields: [senderId], references: [id])
+  thread DMThread @relation(fields: [threadId], references: [id])
 }
