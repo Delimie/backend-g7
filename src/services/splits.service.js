@@ -1,8 +1,10 @@
 import prisma from '../config/prisma.config.js'
 import createError from '../utils/create-error.js'
 
-export const listExpenseSplits = async () => {
-  return await prisma.expenseSplit.findMany()
+export const listExpenseSplits = async (expenseId) => {
+  return await prisma.expenseSplit.findMany({
+    where: { expenseId: Number(expenseId) }
+  })
 }
 
 export const createExpenseSplits = async (expenseId, data) => {
