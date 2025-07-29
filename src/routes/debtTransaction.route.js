@@ -1,18 +1,11 @@
 import express from "express";
+import { confirmTransaction, debtSummary, getTransactions, updateDebtTransaction } from "../controllers/debtTransaction.controller.js";
 
 const debtTransactionRouter = express.Router();
 
-debtTransactionRouter.post('/groups/:groupId/debt-transactions', (req, res) => {
-  res.send('test create transaction')
-})
-debtTransactionRouter.get('/groups/:groupId/debt-summary', (req, res) => {
-  res.send('test get preview transaction')
-})
-debtTransactionRouter.get('/groups/:groupId/debt-transactions', (req, res) => {
-  res.send('test get group transaction')
-})
-debtTransactionRouter.patch('/debt-transactions/:id/confirm', (req, res) => {
-  res.send('test confirm transaction')
-})
+debtTransactionRouter.get('/groups/:groupId/debt-summary', debtSummary)
+debtTransactionRouter.post('/:id', updateDebtTransaction)
+debtTransactionRouter.get('/groups/:groupId/transactions', getTransactions)
+debtTransactionRouter.patch('/debt-transactions/:id/confirm', confirmTransaction)
 
 export default debtTransactionRouter;

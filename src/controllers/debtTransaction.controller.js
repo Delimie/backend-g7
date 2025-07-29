@@ -46,40 +46,68 @@ export const debtSummary = async (req, res, next) => {
       const debtor = debtors[0]
       const creditor = creditors[0]
       const amount = Math.min(debtor.amount, creditor.amount)
+
       summary.push({
-        from: debtor.id,
-        to: creditor.id,
-        amount
+        payerId: debtor.id,
+        receiverId: creditor.id,
+        groupId: Number(groupId),
+        // identity: "INPROGRESS",
+        amount,
+        status: "INPROGRESS",
+        isConfirmed: false
       })
+
       debtor.amount -= amount
       creditor.amount -= amount
 
       if (debtor.amount === 0) debtors.shift()
       if (creditor.amount === 0) creditors.shift()
     }
+
+    const created = await prisma.debtTransaction.createMany({
+      data: summary
+    })
+    console.log(created)
     res.json({ result: summary })
   } catch (error) {
     next(error)
   }
 }
 
-export const createDebtTransactions = async (req, res, next) => {
+// export const createDebtTransactions = async (req, res, next) => {
+//   try {
+//     const { groupId } = req.params
+//     const { payerId, receiverId, amount, status, slip, note, isConfirmed } = req.body
+//     const created = await prisma.debtTransaction.create({
+//       data: {
+//         payerId: Number(payerId),
+//         receiverId: Number(receiverId),
+//         groupId: Number(groupId),
+//         amount: Number(amount),
+//         status: status,
+//         slip: slip,
+//         note: note,
+//         isConfirmed: isConfirmed
+//       }
+//     })
+//     res.json({ result: created })
+//   } catch (error) {
+//     next(error)
+//   }
+// }
+
+export const updateDebtTransaction = async (req, res, next) => {
   try {
-    const { groupId } = req.params
-    const { fromUserId, toUserId, amount, status, slip, note, isConfirmed } = req.body
-    const created = await prisma.debtTransaction.create({
+    const { id } = req.params
+    const { slip, note } = req.body
+    const updated = await prisma.debtTransaction.update({
+      where: { id: Number(id) },
       data: {
-        fromUserId: Number(fromUserId),
-        toUserId: Number(toUserId),
-        groupId: Number(groupId),
-        amount: Number(amount),
-        status: status,
         slip: slip,
-        note: note,
-        isConfirmed: isConfirmed
+        note: note
       }
     })
-    res.json({ result: created })
+    res.json({ result: updated })
   } catch (error) {
     next(error)
   }
