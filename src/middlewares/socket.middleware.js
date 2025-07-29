@@ -21,13 +21,6 @@ export const socketMiddleware = async (socket, next) => {
         address : true,
         createdAt : true,
         updatedAt : true,
-        password,
-        profileImage,
-        coverImage,
-        occupation,
-        address,
-        createdAt,
-        updatedAt,
       }
     });
 
