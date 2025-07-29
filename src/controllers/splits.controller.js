@@ -2,7 +2,8 @@ import * as expenseSplitService from '../services/splits.service.js'
 
 export const listExpenseSplits = async (req, res, next) => {
   try {
-    const result = await expenseSplitService.listExpenseSplits()
+    const { expenseId } = req.params
+    const result = await expenseSplitService.listExpenseSplits(expenseId)
     res.json({ result })
   } catch (error) {
     next(error)
