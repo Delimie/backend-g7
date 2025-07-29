@@ -11,6 +11,7 @@ export const userTyping = (io, socket, data, callback) => {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       socket.to('CHANNELID').emit(CHAT_ACTION.CHAT_TYPING, {
 =======
       socket.to('ROOMID').emit(CHAT_ACTION.CHAT_TYPING, {
@@ -21,12 +22,16 @@ export const userTyping = (io, socket, data, callback) => {
 =======
       socket.to('CHANNEL:ID').emit(CHAT_ACTION.CHAT_TYPING, {
 >>>>>>> edb312f (Modify chat model to not allow userId and groupId null, Add socket sendmessage handler)
+=======
+      socket.to('CHANNEL:ID').emit(CHAT_ACTION.CHAT_TYPING, {
+>>>>>>> edb312f7602b17f888dd9dad5a2a411cd3cf9708
         userName: socket.user.name,
         status: status
       });
     }
 
     // console.log(`User : ${socket.user.name} is not typing`);
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -40,6 +45,9 @@ export const userTyping = (io, socket, data, callback) => {
 =======
     socket.to('CHANNEL:ID').emit(CHAT_ACTION.CHAT_TYPING, {
 >>>>>>> edb312f (Modify chat model to not allow userId and groupId null, Add socket sendmessage handler)
+=======
+    socket.to('CHANNEL:ID').emit(CHAT_ACTION.CHAT_TYPING, {
+>>>>>>> edb312f7602b17f888dd9dad5a2a411cd3cf9708
       userName: socket.user.name,
       status: status
     });
