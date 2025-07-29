@@ -9,7 +9,6 @@ import appointmentRouter from "./src/routes/appointment.route.js";
 import expensesRouter from './src/routes/expenses.route.js'
 import locationsRouter from './src/routes/locations.route.js'
 import debtTransactionRouter from "./src/routes/debtTransaction.route.js";
-import splitsRouter from "./src/routes/splits.route.js";
 
 const app = express()
 
@@ -23,7 +22,6 @@ app.use('/users', userRouter)
 app.use('/appointments', appointmentRouter)
 app.use('/debts', debtTransactionRouter)
 app.use('/expenses', expensesRouter)
-app.use('/splits', splitsRouter)
 app.use('/locations', locationsRouter)
 
 app.use(notFound)
