@@ -10,6 +10,7 @@ export const userTyping = (io, socket, data, callback) => {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       socket.to('CHANNELID').emit(CHAT_ACTION.CHAT_TYPING, {
 =======
       socket.to('ROOMID').emit(CHAT_ACTION.CHAT_TYPING, {
@@ -17,12 +18,16 @@ export const userTyping = (io, socket, data, callback) => {
 =======
       socket.to('ROOMID').emit(CHAT_ACTION.CHAT_TYPING, {
 >>>>>>> 4670d99 (add socket.on uesrtyping event, refactor socket folder structure separate handlers and event)
+=======
+      socket.to('CHANNEL:ID').emit(CHAT_ACTION.CHAT_TYPING, {
+>>>>>>> edb312f (Modify chat model to not allow userId and groupId null, Add socket sendmessage handler)
         userName: socket.user.name,
         status: status
       });
     }
 
     // console.log(`User : ${socket.user.name} is not typing`);
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     socket.to('CHANNELID').emit(CHAT_ACTION.CHAT_TYPING, {
@@ -32,6 +37,9 @@ export const userTyping = (io, socket, data, callback) => {
 =======
     socket.to('ROOMID').emit(CHAT_ACTION.CHAT_TYPING, {
 >>>>>>> 4670d99 (add socket.on uesrtyping event, refactor socket folder structure separate handlers and event)
+=======
+    socket.to('CHANNEL:ID').emit(CHAT_ACTION.CHAT_TYPING, {
+>>>>>>> edb312f (Modify chat model to not allow userId and groupId null, Add socket sendmessage handler)
       userName: socket.user.name,
       status: status
     });
