@@ -173,13 +173,13 @@ model Message {
 
 model Attachment {
   id        Int    @id @default(autoincrement())
-  messageId Int
   url       String // File URL
   type      String // MIME type like "image/png", "video/mp4"
   name      String // Original file name
   size      Int // Optional: file size in bytes
 
   message Message @relation(fields: [messageId], references: [id])
+  messageId Int
 }
 
 enum ChannelType {
