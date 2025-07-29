@@ -4,10 +4,10 @@ import * as userService from '../services/user.service.js'
 
 export const createGroup = async (req, res, next) => {
   try {
-
     const { name } = req.body
-    const group = await groupService.createGroup({ name })
-    res.status(201).json(group)
+    const ownerId = req.user?.id
+    const group = await groupService.createGroup({ name, ownerId })
+    res.status(201).json({ message: 'Group created', group })
   } catch (err) {
     next(err)
   }

@@ -1,10 +1,39 @@
 import prisma from '../config/prisma.config.js'
 import createError from '../utils/create-error.js'
 
-export const createGroup = (data) => {
-  return prisma.group.create({
-    data,
+export const createGroup = async ({ name, ownerId }) => {
+
+  if (!name) createError(400, 'Group name is required')
+  if (!ownerId) createError(400, 'Owner ID is required')
+
+  const user = await prisma.user.findUnique({ where: { id: ownerId } })
+  if (!user) createError(404, 'User not found')
+
+  const group = await prisma.group.create({
+    data: {
+      name,
+      user: {
+        create: {
+          userId: ownerId,
+          role: 'ADMIN'
+        }
+      }
+    },
+    include:{
+      user: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              profileImage: true
+            }
+          }
+        }
+      }
+    }
   })
+  return group
 }
 
 export const getGroupById = (id) => {
