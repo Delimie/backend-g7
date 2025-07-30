@@ -53,6 +53,10 @@ export const removeUser = async (id) => {
 }
 
 export const getUserById = async (id) => {
+  const user = await prisma.user.findFirst({
+    where: { id: Number(id) }
+  })
+  if (!user) createError(400, 'User not found')
   return await prisma.user.findFirst({
     where: { id },
     select: {
