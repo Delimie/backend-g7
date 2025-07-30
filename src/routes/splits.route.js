@@ -15,3 +15,4 @@ splitsRouter.patch('/:splitId', updateExpenseSplit)
 splitsRouter.delete('/:splitId', removeExpenseSplit)
 
 export default splitsRouter
+  

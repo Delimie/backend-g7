@@ -2,6 +2,10 @@ import prisma from '../config/prisma.config.js'
 import createError from '../utils/create-error.js'
 
 export const listExpenseSplits = async (expenseId) => {
+
+  const expense = await prisma.expense.findFirst({ where: { id: Number(expenseId) } })
+  if (!expense) createError(400, 'Not found expense id')
+
   return await prisma.expenseSplit.findMany({
     where: { expenseId: Number(expenseId) }
   })

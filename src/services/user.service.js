@@ -1,3 +1,4 @@
+import cloudinary from '../config/cloudinary.config.js'
 import prisma from '../config/prisma.config.js'
 import createError from '../utils/create-error.js'
 
@@ -31,18 +32,32 @@ export const listUser = async () => {
   })
 }
 
-export const updateUser = async (id, data) => {
+export const updateUser = async (id, data, files) => {
+  const updatedData = {}
+  const fields = ['name', 'mobile', 'birthDate', 'occupation', 'address']
+
+  fields.forEach(key => {
+    if (data[key]) updatedData[key] = data[key]
+  })
+
+  // if (data.birthDate) {
+  //   const date = new Date(data.birthDate)
+  //   if (!isNaN(date)) updatedData.birthDate = date
+  // }
+
+  if (files?.profileImage?.[0]) {
+    const upload = await cloudinary.uploader.upload(files.profileImage[0].path)
+    updatedData.profileImage = upload.secure_url
+  }
+
+  if (files?.qrCode?.[0]) {
+    const upload = await cloudinary.uploader.upload(files.qrCode[0].path)
+    updatedData.qrCode = upload.secure_url
+  }
+
   return await prisma.user.update({
     where: { id },
-    data: {
-      name: data.name,
-      mobile: data.mobile,
-      birthDate: new Date(data.birthDate),
-      occupation: data.occupation,
-      address: data.address,
-      profileImage: data.profileImage,
-      coverImage: data.coverImage
-    }
+    data: updatedData
   })
 }
 
