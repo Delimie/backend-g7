@@ -24,7 +24,7 @@ export const createGroup = async ({ name, ownerId }) => {
         include: {
           user: {
             select: {
-              id: true,
+              // id: true,
               name: true,
               profileImage: true
             }
