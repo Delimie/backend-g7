@@ -2,7 +2,7 @@ import * as userService from '../services/user.service.js'
 
 export const getMe = async (req, res, next) => {
   try {
-    
+
     // console.log('req.user in getMe:', req.user);
 
     if (!req.user || !req.user.id) {

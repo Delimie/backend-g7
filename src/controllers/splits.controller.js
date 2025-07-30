@@ -13,7 +13,8 @@ export const listExpenseSplits = async (req, res, next) => {
 export const createExpenseSplits = async (req, res, next) => {
   try {
     const { expenseId } = req.params
-    const result = await expenseSplitService.createExpenseSplits(Number(expenseId), req.body)
+    const ownerId = req.user?.id
+    const result = await expenseSplitService.createExpenseSplits(Number(expenseId), req.body, Number(ownerId))
     res.json({ message: 'Create split successfully', result })
   } catch (error) {
     next(error)
@@ -32,8 +33,8 @@ export const updateExpenseSplit = async (req, res, next) => {
 
 export const removeExpenseSplit = async (req, res, next) => {
   try {
-    const { splitId } = req.params
-    const result = await expenseSplitService.removeExpenseSplit(Number(splitId))
+    const { expenseId, splitId } = req.params
+    const result = await expenseSplitService.removeExpenseSplit(Number(expenseId), Number(splitId))
     res.json({ message: `Delete ${splitId} success`, result })
   } catch (error) {
     next(error)
