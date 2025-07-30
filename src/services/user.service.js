@@ -12,6 +12,7 @@ export const getMe = async (id) => {
       email: true,
       mobile: true,
       birthDate: true,
+      gender: true,
       occupation: true,
       address: true
     }
@@ -26,6 +27,7 @@ export const listUser = async () => {
       email: true,
       mobile: true,
       birthDate: true,
+      gender: true,
       occupation: true,
       address: true
     }
@@ -81,6 +83,7 @@ export const getUserById = async (id) => {
       mobile: true,
       birthDate: true,
       occupation: true,
+      gender: true,
       address: true
     }
   })
