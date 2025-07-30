@@ -25,6 +25,7 @@ model User {
   occupation   String?
   address      String?
   profileImage String            @default("https://img2.pic.in.th/pic/profilegroup.png")
+  qrCode       String?
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt @db.Timestamp(0)
   group        GroupUser[]
