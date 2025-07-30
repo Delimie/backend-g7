@@ -16,7 +16,7 @@ export const createExpense = async (data) => {
     createError(404, 'Group not found')
   }
 
-  const groupUser = await prisma.groupUser.findFirst({
+  const groupUser = await prisma.groupUser.findFirst({ 
     where: { groupId, userId }
   })
   if (!groupUser) {
