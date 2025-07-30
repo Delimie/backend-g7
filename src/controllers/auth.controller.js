@@ -71,3 +71,46 @@ export const login = async (req, res, next) => {
     next(error)
   }
 }
+
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body
+    const user = await prisma.user.findUnique({
+      where: { email: email }
+    })
+    if (!user) createError(400, 'User not found')
+
+    const frontURL = "http://localhost:5173/reset-password"
+
+    const payload = { id: user.id }
+    const token = jwt.sign(payload, process.env.RESET_SECRET, {
+      algorithm: "HS256",
+      expiresIn: "30d"
+    })
+    const link = `${frontURL}/${token}`
+
+    res.json({ message: "Reset password link", link })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const resetPassword = async (req, res, next) => {
+  const { token } = req.params
+  const { password } = req.body
+  try {
+    const payload = jwt.verify(token, process.env.RESET_SECRET, {
+      algorithms: ["HS256"],
+    });
+    // console.log("payload =>", payload)
+    const id = payload.id
+    const hash = await bcrypt.hash(password, 10)
+    const user = await prisma.user.update({
+      where: { id: Number(id) },
+      data: { password: hash }
+    })
+    res.json({ message: "Password reset successful", user: { id: user.id, email: user.email } })
+  } catch (error) {
+    next(error)
+  }
+}
