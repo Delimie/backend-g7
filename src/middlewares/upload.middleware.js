@@ -1,15 +1,6 @@
 import multer from "multer";
 import path from 'path';
 
-// console.log(process.cwd())
-// console.log(import.meta.url)
-
-// let picPath = process.cwd() + '/' + 'temp-pic'
-// console.log(picPath)
-
-// // Window Path เพื่อใช้ multer กำนหด path ในการลง files
-// let picPath2 = path.join(process.cwd(), 'temp-pic')
-// console.log(picPath2)
 
 const dest = path.join(process.cwd(), 'temp-pic')
 

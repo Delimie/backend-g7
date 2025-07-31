@@ -15,7 +15,9 @@ export const getMe = async (id) => {
       birthDate: true,
       gender: true,
       occupation: true,
-      address: true
+      address: true,
+      profileImage: true,
+      qrCode: true
     }
   })
 }
@@ -30,14 +32,16 @@ export const listUser = async () => {
       birthDate: true,
       gender: true,
       occupation: true,
-      address: true
+      address: true,
+      profileImage: true,
+      qrCode: true
     }
   })
 }
 
 export const updateUser = async (id, data, files) => {
   const updatedData = {}
-  const fields = ['name', 'mobile', 'occupation', 'address']
+  const fields = ['name', 'mobile', 'birthDate', 'gender', 'occupation', 'address']
 
   fields.forEach(key => {
     if (data[key]) updatedData[key] = data[key]
