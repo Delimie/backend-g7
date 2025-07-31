@@ -14,7 +14,9 @@ export const getMe = async (id) => {
       birthDate: true,
       gender: true,
       occupation: true,
-      address: true
+      address: true,
+      profileImage: true,
+      qrCode: true
     }
   })
 }
@@ -29,23 +31,25 @@ export const listUser = async () => {
       birthDate: true,
       gender: true,
       occupation: true,
-      address: true
+      address: true,
+      profileImage: true,
+      qrCode: true
     }
   })
 }
 
 export const updateUser = async (id, data, files) => {
   const updatedData = {}
-  const fields = ['name', 'mobile', 'birthDate', 'occupation', 'address']
+  const fields = ['name', 'mobile', 'birthDate', 'gender', 'occupation', 'address']
 
   fields.forEach(key => {
     if (data[key]) updatedData[key] = data[key]
   })
 
-  // if (data.birthDate) {
-  //   const date = new Date(data.birthDate)
-  //   if (!isNaN(date)) updatedData.birthDate = date
-  // }
+  if (data.birthDate) {
+    const date = new Date(data.birthDate)
+    if (!isNaN(date)) updatedData.birthDate = date
+  }
 
   if (files?.profileImage?.[0]) {
     const upload = await cloudinary.uploader.upload(files.profileImage[0].path)
