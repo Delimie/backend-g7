@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs'
 import cloudinary from '../config/cloudinary.config.js'
 import prisma from '../config/prisma.config.js'
 import createError from '../utils/create-error.js'
@@ -93,3 +94,24 @@ export const getUserById = async (id) => {
   })
 }
 
+export const handleChangePassword = async (userId, currentPassword, newPassword) => {
+  const user = await prisma.user.findFirst({
+    where: { id: Number(userId) },
+  });
+
+  if (!user) {
+    throw createError(404, "User not found");
+  }
+
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
+  if (!isMatch) {
+    throw createError(400, "Password is incorrect");
+  }
+
+  const hashed = await bcrypt.hash(newPassword, 10);
+
+  await prisma.user.update({
+    where: { id: Number(userId) },
+    data: { password: hashed },
+  });
+};
