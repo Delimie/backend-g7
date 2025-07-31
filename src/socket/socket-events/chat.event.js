@@ -5,25 +5,35 @@ export const userTyping = (io, socket, data, callback) => {
   // Listen to user typing status
   if (!data) return;
 
-  const { status } = data;
+  const { status, channelId } = data;
   if (status === STATUS.ACTIVE) {
     // console.log(`User : ${socket.user.name} is typing`);
 
     // Actual emit that has to happen
-    socket.to('CHANNEL:ID').emit(CHAT_ACTION.CHAT_TYPING, {
+    socket.to(`CHANNEL:${channelId}`).emit(CHAT_ACTION.CHAT_TYPING, {
+      userId : socket.user.id,
       userName: socket.user.name,
       status: status
     });
-
+    
     // For testing user is typing notification
     socket.emit(CHAT_ACTION.CHAT_TYPING, {
+      userId : socket.user.id,
       userName: socket.user.name,
       status: status
     });
+    
+    return ;
   }
-
-  // console.log(`User : ${socket.user.name} is not typing`);
-  socket.to('CHANNEL:ID').emit(CHAT_ACTION.CHAT_TYPING, {
+  
+  socket.to(`CHANNEL:${channelId}`).emit(CHAT_ACTION.CHAT_TYPING, {
+    userId : socket.user.id,
+    userName: socket.user.name,
+    status: status
+  });
+  
+  socket.emit(CHAT_ACTION.CHAT_TYPING, {
+    userId : socket.user.id,
     userName: socket.user.name,
     status: status
   });
@@ -127,7 +137,7 @@ export const userEditMessage = async (io, socket, data, callback) => {
 
     socket.to(`CHANNEL:${response.channelId}`).emit(CHAT_ACTION.CHAT_EDIT, {
       message: `User ${socket.user.name} edited the message ${response.id}`,
-      newData : response,
+      newData: response,
     });
 
     socket.to(`GROUP:${groupId}`).emit(NOTI_ACTION.NOTI_UPDATE, { channel: channelId, userId: userId, updateAt: Date.now() });

@@ -1,5 +1,5 @@
 import { socketMiddleware } from "../middlewares/socket.middleware.js";
-import { CHAT_ACTION } from "../shared/constants/socket.constant.js";
+import { CHANNEL_ACTION, CHAT_ACTION, GROUP_ACTION } from "../shared/constants/socket.constant.js";
 import { chatHandler } from "./socket-handlers/chat.handler.js";
 
 const registerSocketRoute = (io) => {
@@ -9,7 +9,17 @@ const registerSocketRoute = (io) => {
     // Update user Online status
     socket.user.status = true;
 
-    chatHandler(io,socket);
+    // TRY TO CHECK JOIN ROOM
+    socket.on(GROUP_ACTION.GROUP_JOIN, ({ groupId }) => {
+      socket.join(`GROUP:${groupId}`);
+      console.log(socket.user.name,' has join group ',groupId);
+    });
+    socket.on(CHANNEL_ACTION.CHANNEL_JOIN,({channelId})=>{
+      socket.join(`CHANNEL:${channelId}`);    
+      console.log(socket.user.name,' has join channel ',channelId);
+    });
+
+    chatHandler(io, socket);
 
     socket.on('disconnect', (reason) => {
       console.log(`Socket id : ${socket.id} has disconnected reason : ${reason}`);
