@@ -28,9 +28,8 @@ export const listUser = async (req, res, next) => {
 export const updateUser = async (req, res, next) => {
   try {
     const { id } = req.params
-    const result = await userService.updateUser(Number(id), req.body)
-    const { password, createdAt, updatedAt, ...userData } = result
-    res.json({ message: 'Update successfully', userData })
+    const result = await userService.updateUser(Number(id), req.body, req.files)
+    res.json({ message: 'Update successfully', result })
   } catch (error) {
     next(error)
   }
