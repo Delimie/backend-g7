@@ -54,3 +54,15 @@ export const getUserById = async (req, res, next) => {
     next(error)
   }
 }
+
+export const changePassword = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    console.log("userId =>", userId)
+    const { currentPassword, newPassword } = req.body;
+    await userService.handleChangePassword(userId, currentPassword, newPassword);
+    res.json({ message: "Password updated successfully" });
+  } catch (error) {
+    next(error);
+  }
+};

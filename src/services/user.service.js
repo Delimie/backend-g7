@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs'
 import cloudinary from '../config/cloudinary.config.js'
 import prisma from '../config/prisma.config.js'
 import createError from '../utils/create-error.js'
@@ -36,16 +37,16 @@ export const listUser = async () => {
 
 export const updateUser = async (id, data, files) => {
   const updatedData = {}
-  const fields = ['name', 'mobile', 'birthDate', 'occupation', 'address']
+  const fields = ['name', 'mobile', 'occupation', 'address']
 
   fields.forEach(key => {
     if (data[key]) updatedData[key] = data[key]
   })
 
-  // if (data.birthDate) {
-  //   const date = new Date(data.birthDate)
-  //   if (!isNaN(date)) updatedData.birthDate = date
-  // }
+  if (data.birthDate) {
+    const date = new Date(data.birthDate)
+    if (!isNaN(date)) updatedData.birthDate = date
+  }
 
   if (files?.profileImage?.[0]) {
     const upload = await cloudinary.uploader.upload(files.profileImage[0].path)
@@ -89,3 +90,24 @@ export const getUserById = async (id) => {
   })
 }
 
+export const handleChangePassword = async (userId, currentPassword, newPassword) => {
+  const user = await prisma.user.findFirst({
+    where: { id: Number(userId) },
+  });
+
+  if (!user) {
+    throw createError(404, "User not found");
+  }
+
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
+  if (!isMatch) {
+    throw createError(400, "Password is incorrect");
+  }
+
+  const hashed = await bcrypt.hash(newPassword, 10);
+
+  await prisma.user.update({
+    where: { id: Number(userId) },
+    data: { password: hashed },
+  });
+};
