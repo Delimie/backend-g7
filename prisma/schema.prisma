@@ -152,7 +152,7 @@ model DebtTransaction {
 model Channel {
   id        Int         @id @default(autoincrement())
   name      String
-  type      ChannelType // 'TEXT' | 'VOICE' | 'PRIVATE'
+  type      ChannelType // 'TEXT' | 'VOICE' | 'PRIVATE' | 'BILL'
   messages  Message[]
   createdAt DateTime    @default(now())
   Group     Group       @relation(fields: [groupId], references: [id])
@@ -167,7 +167,7 @@ model Message {
   content   String?
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt @db.Timestamp(0)
-  channel   Channel   @relation(fields: [channelId], references: [id])
+  channel   Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
   channelId Int
 
   attachments Attachment[]
@@ -180,7 +180,7 @@ model Attachment {
   name String // Original file name
   size Int // Optional: file size in bytes
 
-  message   Message @relation(fields: [messageId], references: [id])
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
   messageId Int
 }
 
@@ -188,6 +188,9 @@ enum ChannelType {
   TEXT
   VOICE
   PRIVATE
+  BILL
+  APPOINTMENT
+  MANAGEMENT
 }
 
 // DM chat
