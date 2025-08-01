@@ -1,5 +1,5 @@
 import express from "express";
-import { getMe, getUserById, listUser, removeUser, updateUser } from "../controllers/user.controller.js";
+import { changePassword, getMe, getUserById, listUser, removeUser, updateUser } from "../controllers/user.controller.js";
 import { authCheck } from "../middlewares/auth.middleware.js";
 import { uploadUserImages } from "../middlewares/upload.middleware.js";
 
@@ -14,6 +14,7 @@ userRouter.get('/:id', authCheck, getUserById)
 userRouter.get('/:id/balance', (req, res) => {
   res.send(`Get balance for user ID: ${req.params.id}`)
 })
+userRouter.post('/change-password', authCheck, changePassword)
 
 
 
