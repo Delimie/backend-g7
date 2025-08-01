@@ -1,5 +1,5 @@
 import prisma from "../../config/prisma.config.js";
-import { CHAT_ACTION, isValidCallback, STATUS } from "../../shared/constants/socket.constant.js";
+import { CHAT_ACTION, CHAT_EVENT, isValidCallback, NOTI_ACTION, STATUS } from "../../shared/constants/socket.constant.js";
 
 export const userTyping = (io, socket, data, callback) => {
   // Listen to user typing status
@@ -46,23 +46,23 @@ export const userSendMessage = async (io, socket, data, callback) => {
 
     // Check if client don't send content or file
     if (!(content || file)) return socket.emit(CHAT_EVENT.CHAT_ERROR, { message: 'Message Content or File is missing' });
-
-    const { url = null, type = null, name = null, size = null } = file;
-    let attachResponse;
-
+  
     console.log(`User : ${userId}, has send a message ${file ? 'with attached file' : ''}`);
-
+    
     // Create message in database
     const messageResponse = await prisma.message.create({
       data: {
         userId: userId,
         content: content,
-        channelId: channelId,
+        channelId: parseInt(channelId),
       }
     });
-
+    console.log(`Create message succesfully : ${messageResponse.id}`);
+    
+    let attachResponse;
     // If file are attached, update database
     if (file) {
+      const { url = null, type = null, name = null, size = null } = file;
       attachResponse = await prisma.attachment.create({
         data: {
           messageId: messageResponse.id,
@@ -74,7 +74,7 @@ export const userSendMessage = async (io, socket, data, callback) => {
       });
     }
 
-    socket.to(`CHANNEL:${channelId}`).emit(CHAT_ACTION.CHAT_SEND, {
+    io.to(`CHANNEL:${channelId}`).emit(CHAT_ACTION.CHAT_SEND, {
       message: messageResponse,
       attachment: attachResponse ? attachResponse : null,
     });

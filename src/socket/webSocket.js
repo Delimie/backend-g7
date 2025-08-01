@@ -18,6 +18,11 @@ const registerSocketRoute = (io) => {
       socket.join(`CHANNEL:${channelId}`);    
       console.log(socket.user.name,' has join channel ',channelId);
     });
+    
+    socket.on(CHANNEL_ACTION.CHANNEL_LEAVE, ({channelId})=>{
+      socket.leave(`CHANNEL:${channelId}`); 
+      console.log(socket.user.name,' has leave channel ',channelId);
+    })
 
     chatHandler(io, socket);
 
