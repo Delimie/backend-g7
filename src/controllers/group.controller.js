@@ -1,13 +1,20 @@
 import * as groupService from '../services/group.service.js'
 import createError from "../utils/create-error.js";
 import * as userService from '../services/user.service.js'
+import {
+  createChannel
+} from '../services/channel.service.js';
 
 export const createGroup = async (req, res, next) => {
   try {
     const { name } = req.body
     const ownerId = req.user?.id
-    const group = await groupService.createGroup({ name, ownerId })
-    res.status(201).json({ message: 'Group created', group })
+    const group = await groupService.createGroup({ name, ownerId });
+
+    // Create starter TEXT channel 
+    const defaultChannel = await createChannel({ name: `Welcome to group : ${name}`, groupId: group.id });
+
+    res.status(201).json({ message: 'Group created', group , channel : defaultChannel})
   } catch (err) {
     next(err)
   }
@@ -115,7 +122,7 @@ export const removeUserFromGroup = async (req, res, next) => {
 export const getUsersInGroup = async (req, res) => {
   const groupId = Number(req.params.id)
   const users = await groupService.getUsersInGroup(groupId)
-  res.json({ message: users  })
+  res.json({ message: users })
 }
 
 export const getGroupSummary = async (req, res) => {
