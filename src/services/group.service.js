@@ -19,7 +19,7 @@ export const createGroup = async ({ name, ownerId }) => {
         }
       }
     },
-    include:{
+    include: {
       user: {
         include: {
           user: {
@@ -37,7 +37,11 @@ export const createGroup = async ({ name, ownerId }) => {
 }
 
 export const getGroupById = (id) => {
-  return prisma.group.findUnique({ where: { id } })
+  const groupId = Number(id)
+  if (!groupId || isNaN(groupId)) {
+    createError(400, 'Invalid group ID')
+  }
+  return prisma.group.findUnique({ where: { id: groupId } })
 }
 
 export const updateGroup = (id, data) => {
@@ -87,18 +91,18 @@ export const getUsersInGroup = async (groupId) => {
   if (!group) createError(404, 'Group not found')
 
   const members = await prisma.groupUser.findMany({
-  where: { groupId },
-  include: {
-    user: {
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        profileImage: true
+    where: { groupId },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          profileImage: true
+        }
       }
     }
-  }
-})
+  })
 
   const users = members.map(m => ({
     id: m.user.id,
@@ -165,3 +169,12 @@ export const getGroupSummary = async (groupId) => {
     totalExpense: totalExpense._sum.amount || 0
   }
 }
+
+export const findGroupsByUserId = async (userId) => {
+  const groupUsers = await prisma.groupUser.findMany({
+    where: { userId: Number(userId) },
+    include: { group: true },
+  });
+
+  return groupUsers.map((gu) => gu.group);
+};
