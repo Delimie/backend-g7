@@ -21,3 +21,11 @@ registerSocketRoute(io);
 httpServer.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`)
 });
+
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('UNHANDLED PROMISE REJECTION:', reason);
+});

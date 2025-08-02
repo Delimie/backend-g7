@@ -5,7 +5,11 @@ import createSocketError from "../utils/create-error-socket.js";
 export const socketMiddleware = async (socket, next) => {
   const token = socket.handshake.auth.token;
   if (!token) {
-    return next(createSocketError(401,`Token is missing`));
+    // Disconnecting the public user
+    setTimeout(() => {
+      socket.disconnect(true);
+    }, 0);
+    return next(createSocketError(401, `Token is missing`));
   }
   try {
     const payload = jwt.verify(token, process.env.SECRET, { algorithms: ['HS256'] });
@@ -13,19 +17,23 @@ export const socketMiddleware = async (socket, next) => {
       where: {
         id: payload.id
       },
-      omit : {
-        password : true,
-        profileImage : true,
-        coverImage : true,
-        occupation : true,
-        address : true,
-        createdAt : true,
-        updatedAt : true,
+      omit: {
+        password: true,
+        profileImage: true,
+        occupation: true,
+        address: true,
+        createdAt: true,
+        updatedAt: true,
       }
     });
 
-    if (!user) next(createSocketError(400,`User doesn't exist`));
-
+    // If not find user force disconnection
+    if (!user) {
+      setTimeout(() => {
+        socket.disconnect(true);
+      }, 0);
+      next(createSocketError(400, `User doesn't exist`));
+    }
     socket.user = user;
     next();
   } catch (error) {

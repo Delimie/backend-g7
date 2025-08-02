@@ -1,3 +1,5 @@
+export const isValidCallback = (callback) => typeof callback === 'function';
+
 // Use for announce status
 export const CHAT_EVENT = {
   NEW_MESSAGE: 'newMessage',
