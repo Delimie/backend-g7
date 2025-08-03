@@ -15,6 +15,10 @@ const io = new Server(httpServer, {
   }
 });
 
+// Attach io to app 
+// How to use : const io = req.app.get('io'); on http route
+app.set('io',io);
+
 // SocketIO Route
 registerSocketRoute(io);
 
