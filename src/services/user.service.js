@@ -89,7 +89,9 @@ export const getUserById = async (id) => {
       birthDate: true,
       occupation: true,
       gender: true,
-      address: true
+      address: true,
+      profileImage: true,
+      qrCode: true
     }
   })
 }
