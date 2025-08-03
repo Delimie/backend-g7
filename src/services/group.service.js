@@ -12,7 +12,7 @@ export const createGroup = async ({ name, ownerId }) => {
   const group = await prisma.group.create({
     data: {
       name,
-      user: {
+      groupUsers: {
         create: {
           userId: ownerId,
           role: 'ADMIN'
@@ -20,7 +20,7 @@ export const createGroup = async ({ name, ownerId }) => {
       }
     },
     include: {
-      user: {
+      groupUsers: {
         include: {
           user: {
             select: {
@@ -38,7 +38,7 @@ export const createGroup = async ({ name, ownerId }) => {
 
 export const getGroupById = (id) => {
   const groupId = Number(id)
-  if (!groupId || isNaN(groupId)) {
+  if (isNaN(groupId) || groupId <= 0) {
     createError(400, 'Invalid group ID')
   }
   return prisma.group.findUnique({ where: { id: groupId } })

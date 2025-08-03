@@ -7,7 +7,7 @@ export const createChannel = async (data) => {
   if (!name) createError(400, 'Channel name is required');
   if (!groupId) createError(400, 'Group ID is required');
 
-  const existingGroup = await prisma.channel.findUnique({ where: { id: groupId } })
+  const existingGroup = await prisma.group.findUnique({ where: { id: groupId } })
   if (!existingGroup) createError(404, 'Group not found')
 
   const channel = await prisma.channel.create({
