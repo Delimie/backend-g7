@@ -4,10 +4,13 @@ import { authCheck } from '../middlewares/auth.middleware.js'
 
 const channelRouter = express.Router()
 
+channelRouter.get('/my', authCheck, channelController.getMyChannels)
+
 channelRouter.post('/',authCheck, channelController.createNewChannel)
-channelRouter.get('/:id', channelController.getChannelByGroupId)
-channelRouter.patch('/:id', channelController.updateChannel)
-channelRouter.delete('/:id', channelController.deleteChannel)
+channelRouter.get('/:id',authCheck, channelController.getChannelByGroupId)
+channelRouter.patch('/:id',authCheck, channelController.updateChannel)
+channelRouter.delete('/:id',authCheck, channelController.deleteChannel)
+
 
 
 export default channelRouter

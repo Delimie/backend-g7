@@ -24,6 +24,15 @@ export const getChannelByGroupId = (groupId) => {
   return prisma.channel.findMany({ where: { groupId: groupId } });
 };
 
+export const findChannelsByUserId = async (userId) => {
+  const channelUsers = await prisma.user.findUnique({
+    where: { id: Number(userId) },
+    // include: { channel: true },
+  });
+
+  return channelUsers
+};
+
 export const getChannelById = (channelId) => {
   return prisma.channel.findUnique({ where: { id: channelId } });
 };

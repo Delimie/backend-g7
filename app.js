@@ -10,6 +10,7 @@ import expensesRouter from './src/routes/expenses.route.js'
 import locationsRouter from './src/routes/locations.route.js'
 import debtTransactionRouter from "./src/routes/debtTransaction.route.js";
 import channelRouter from "./src/routes/channel.route.js";
+import chatRouter from "./src/routes/chat.route.js";
 
 const app = express()
 
@@ -20,6 +21,7 @@ app.use(express.json())
 app.use('/auth', authRouter)
 app.use('/groups', groupRouter)
 app.use('/channels', channelRouter)
+app.use('/chats',chatRouter)
 app.use('/users', userRouter)
 app.use('/appointments', appointmentRouter)
 app.use('/debts', debtTransactionRouter)

@@ -1,6 +1,19 @@
 import * as channelService from "../services/channel.service.js";
 import createError from "../utils/create-error.js";
 
+export const getMyChannels = async (req, res, next) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) createError(400, "Unauthorized: userId missing")
+    // console.log('req.user:', req.user)
+    const channels = await channelService.findChannelsByUserId(Number(userId));
+    // console.log('groups found:', groups)
+    res.json({ message: 'Get all channel succesfull', result: channels });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const createNewChannel = async (req, res, next) => {
   try {
     const { name, type, groupId } = req.body;

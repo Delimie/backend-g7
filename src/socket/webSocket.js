@@ -1,6 +1,8 @@
 import { socketMiddleware } from "../middlewares/socket.middleware.js";
-import { CHANNEL_ACTION, CHAT_ACTION, GROUP_ACTION } from "../shared/constants/socket.constant.js";
+import { CHAT_ACTION } from "../shared/constants/socket.constant.js";
+import { channelHandler } from "./socket-handlers/channel.handler.js";
 import { chatHandler } from "./socket-handlers/chat.handler.js";
+import { groupHandler } from "./socket-handlers/group.handler.js";
 
 const registerSocketRoute = (io) => {
   io.use(socketMiddleware).on('connection', (socket) => {
@@ -10,19 +12,8 @@ const registerSocketRoute = (io) => {
     socket.user.status = true;
 
     // TRY TO CHECK JOIN ROOM
-    socket.on(GROUP_ACTION.GROUP_JOIN, ({ groupId }) => {
-      socket.join(`GROUP:${groupId}`);
-      console.log(socket.user.name,' has join group ',groupId);
-    });
-    socket.on(CHANNEL_ACTION.CHANNEL_JOIN,({channelId})=>{
-      socket.join(`CHANNEL:${channelId}`);    
-      console.log(socket.user.name,' has join channel ',channelId);
-    });
-    
-    socket.on(CHANNEL_ACTION.CHANNEL_LEAVE, ({channelId})=>{
-      socket.leave(`CHANNEL:${channelId}`); 
-      console.log(socket.user.name,' has leave channel ',channelId);
-    })
+    groupHandler(io, socket);
+    channelHandler(io, socket);
 
     chatHandler(io, socket);
 
