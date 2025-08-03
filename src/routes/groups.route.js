@@ -4,15 +4,17 @@ import { authCheck } from '../middlewares/auth.middleware.js'
 
 const groupRouter = express.Router()
 
+groupRouter.get('/my', authCheck, groupController.getMyGroups)
+
 groupRouter.post('/',authCheck, groupController.createGroup)
-groupRouter.get('/:id', groupController.getGroupById)
-groupRouter.patch('/:id', groupController.updateGroup)
-groupRouter.delete('/:id', groupController.deleteGroup)
+groupRouter.get('/:id', authCheck, groupController.getGroupById)
+groupRouter.patch('/:id', authCheck, groupController.updateGroup)
+groupRouter.delete('/:id', authCheck, groupController.deleteGroup)
 
-groupRouter.post('/:id/users', groupController.addUserToGroup)
-groupRouter.delete('/:id/users/:userId', groupController.removeUserFromGroup)
-groupRouter.get('/:id/users', groupController.getUsersInGroup)
+groupRouter.post('/:id/users', authCheck, groupController.addUserToGroup)
+groupRouter.delete('/:id/users/:userId', authCheck, groupController.removeUserFromGroup)
+groupRouter.get('/:id/users', authCheck, groupController.getUsersInGroup)
 
-groupRouter.get('/:groupId/summary', groupController.getGroupSummary)
+groupRouter.get('/:groupId/summary', authCheck, groupController.getGroupSummary)
 
 export default groupRouter

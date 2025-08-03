@@ -23,15 +23,14 @@ export const createGroup = async (req, res, next) => {
 export const getGroupById = async (req, res, next) => {
   try {
     const groupId = Number(req.params.id)
+    if (!groupId) createError(400, "Invalid group ID")
+    
     const group = await groupService.getGroupById(groupId)
-
-    if (!group) {
-      createError(404, 'Group not found')
-    }
-
+    if (!group) createError(404, "Group not found")
+    
     res.json(group)
-  } catch (err) {
-    next(err)
+  } catch (error) {
+    next(error)
   }
 }
 
@@ -131,3 +130,16 @@ export const getGroupSummary = async (req, res) => {
   const summary = await groupService.getGroupSummary(groupId)
   res.json(summary)
 }
+
+export const getMyGroups = async (req, res, next) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) createError(400, "Unauthorized: userId missing")
+      console.log('req.user:', req.user)
+    const groups = await groupService.findGroupsByUserId(Number(userId));
+    // console.log('groups found:', groups)
+    res.json({ result: groups });
+  } catch (error) {
+    next(error);
+  }
+};
