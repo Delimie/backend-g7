@@ -108,7 +108,8 @@ export const getUsersInGroup = async (groupId) => {
           id: true,
           name: true,
           email: true,
-          profileImage: true
+          profileImage: true,
+          onlineStatus: true,
         }
       }
     }
@@ -119,7 +120,8 @@ export const getUsersInGroup = async (groupId) => {
     name: m.user.name,
     email: m.user.email,
     profileImage: m.user.profileImage,
-    role: m.role
+    role: m.role,
+    onlineStatus : m.user.onlineStatus,
   }))
 
   return {

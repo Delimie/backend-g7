@@ -146,7 +146,7 @@ export const getMyGroups = async (req, res, next) => {
   try {
     const userId = req.user?.id;
     if (!userId) createError(400, "Unauthorized: userId missing")
-    console.log('req.user:', req.user)
+    // console.log('req.user:', req.user)
     const groups = await groupService.findGroupsByUserId(Number(userId));
     // console.log('groups found:', groups)
     res.json({ result: groups });
