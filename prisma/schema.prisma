@@ -55,14 +55,16 @@ enum Role {
 }
 
 model GroupUser {
-  id          Int                    @id @default(autoincrement())
-  role        Role                   @default(USER)
-  user        User                   @relation(fields: [userId], references: [id])
+  id          Int       @id @default(autoincrement())
+  role        Role      @default(USER)
+  user        User      @relation(fields: [userId], references: [id])
   userId      Int
-  group       Group                  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  group       Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
   groupId     Int
   expense     Expense[]
   appointment GroupUserAppointment[]
+
+  @@unique([groupId, userId])
 }
 
 enum Identity {

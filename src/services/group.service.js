@@ -55,14 +55,24 @@ export const deleteGroup = (id) => {
   return prisma.group.delete({ where: { id } })
 }
 
-export const findGroupUser = async (groupId, userId) => {
-  return await prisma.groupUser.findFirst({
+export const findGroupUser = (groupId, userId) => {
+  return prisma.groupUser.findUnique({
     where: {
-      groupId,
-      userId,
+      groupId_userId: {
+        groupId,
+        userId
+      }
+    }
+  });
+};
+
+export const findUserByName = (name) => {
+  return prisma.user.findFirst({
+    where: {
+      name: name,
     },
-  })
-}
+  });
+};
 
 export const addUserToGroup = (groupId, userId, role = 'USER') => {
   return prisma.groupUser.create({

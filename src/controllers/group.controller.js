@@ -14,7 +14,7 @@ export const createGroup = async (req, res, next) => {
     // Create starter TEXT channel 
     const defaultChannel = await createChannel({ name: `Welcome to group : ${name}`, groupId: group.id });
 
-    res.status(201).json({ message: 'Group created', group , channel : defaultChannel})
+    res.status(201).json({ message: 'Group created', group, channel: defaultChannel })
   } catch (err) {
     next(err)
   }
@@ -24,10 +24,10 @@ export const getGroupById = async (req, res, next) => {
   try {
     const groupId = Number(req.params.id)
     if (!groupId) createError(400, "Invalid group ID")
-    
+
     const group = await groupService.getGroupById(groupId)
     if (!group) createError(404, "Group not found")
-    
+
     res.json(group)
   } catch (error) {
     next(error)
@@ -72,31 +72,42 @@ export const deleteGroup = async (req, res, next) => {
 
 export const addUserToGroup = async (req, res, next) => {
   try {
-    const groupId = Number(req.params.id)
-    const userId = req.body.userId
-    const role = req.body.role || 'USER'
+    const groupId = Number(req.params.id);
+    const { userId, userName, role = 'USER' } = req.body;
 
-    const group = await groupService.getGroupById(groupId)
-    if (!group) {
-      createError(404, 'Group not found')
+    if (!userId && !userName) {
+      return createError(400, 'User ID or User Name is required');
     }
 
-    const user = await userService.getUserById(userId)
-    if (!user) {
-      createError(404, 'User not found')
+    const group = await groupService.getGroupById(groupId);
+    if (!group) createError(404, 'Group not found');
+
+    let user;
+    if (userId) {
+      user = await userService.getUserById(userId);
+    } else if (userName) {
+      user = await userService.findUserByName(userName);
     }
 
-    const existingMember = await groupService.findGroupUser(groupId, userId)
-    if (existingMember) {
-      createError(400, 'User already in group')
-    }
+    if (!user) createError(404, 'User not found');
 
-    const result = await groupService.addUserToGroup(groupId, userId, role)
-    res.status(201).json(result)
+    const existingMember = await groupService.findGroupUser(groupId, user.id);
+    if (existingMember) createError(400, 'User already in group');
+
+    const newMembership = await groupService.addUserToGroup(groupId, user.id, role);
+
+    res.status(201).json({
+      message: 'User added to group successfully',
+      newMember: {
+        id: user.id,
+        name: user.name,
+        profileImage: user.profileImage,
+      },
+    });
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 export const removeUserFromGroup = async (req, res, next) => {
   try {
@@ -135,7 +146,7 @@ export const getMyGroups = async (req, res, next) => {
   try {
     const userId = req.user?.id;
     if (!userId) createError(400, "Unauthorized: userId missing")
-      console.log('req.user:', req.user)
+    console.log('req.user:', req.user)
     const groups = await groupService.findGroupsByUserId(Number(userId));
     // console.log('groups found:', groups)
     res.json({ result: groups });
