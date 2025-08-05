@@ -16,12 +16,12 @@ export const userTyping = (io, socket, data, callback) => {
       status: status
     });
     
-    // For testing user is typing notification
-    socket.emit(CHAT_ACTION.CHAT_TYPING, {
-      userId : socket.user.id,
-      userName: socket.user.name,
-      status: status
-    });
+    // // For testing user is typing notification
+    // socket.emit(CHAT_ACTION.CHAT_TYPING, {
+    //   userId : socket.user.id,
+    //   userName: socket.user.name,
+    //   status: status
+    // });
     
     return ;
   }
@@ -79,7 +79,8 @@ export const userSendMessage = async (io, socket, data, callback) => {
       attachment: attachResponse ? attachResponse : null,
     });
 
-    socket.to(`GROUP:${groupId}`).emit(NOTI_ACTION.NOTI_UPDATE, { channel: channelId, userId: userId, updateAt: Date.now() });
+    console.log(`User ${socket.user.name} emit to group ${groupId}`);
+    socket.to(`GROUP:${groupId}`).emit(NOTI_ACTION.NOTI_UPDATE, {groupId : Number(groupId), channelId: Number(channelId), userId: userId, updateAt: Date.now() });
 
     if (isValidCallback(callback)) callback({ success: true, message: messageResponse });
 
@@ -108,7 +109,7 @@ export const userDeleteMessage = async (io, socket, data, callback) => {
       id: deleteResponse.id,
     });
 
-    socket.to(`GROUP:${groupId}`).emit(NOTI_ACTION.NOTI_UPDATE, { channel: channelId, userId: userId, updateAt: Date.now() });
+    socket.to(`GROUP:${groupId}`).emit(NOTI_ACTION.NOTI_UPDATE, { group: Number(groupId),channel: Number(channelId), userId: userId, updateAt: Date.now() });
 
     if (isValidCallback(callback)) callback({ success: true, message: 'Delete successful' });
 
