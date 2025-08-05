@@ -1,6 +1,7 @@
 import prisma from "../config/prisma.config.js";
 import jwt from 'jsonwebtoken';
 import createSocketError from "../utils/create-error-socket.js";
+import { GROUP_ACTION, USER_ACTION } from "../shared/constants/socket.constant.js";
 
 export const socketMiddleware = async (socket, next) => {
   const token = socket.handshake.auth.token;
@@ -18,8 +19,11 @@ export const socketMiddleware = async (socket, next) => {
         id: payload.id
       },
       omit: {
+        gender: true,
+        mobile: true,
+        qrCode: true,
         password: true,
-        profileImage: true,
+        profileImage: false,
         occupation: true,
         address: true,
         createdAt: true,
@@ -34,7 +38,23 @@ export const socketMiddleware = async (socket, next) => {
       }, 0);
       next(createSocketError(400, `User doesn't exist`));
     }
+
     socket.user = user;
+    socket.user.onlineStatus = "ONLINE";
+    socket.user.status = true;
+
+    //Join all group that user are in
+    const userGroups = await prisma.groupUser.findMany({
+      where: { userId: Number(socket.user.id) },
+      include: { group: true },
+    });
+    for (let eachGroup of userGroups) {
+      socket.join(`GROUP:${eachGroup.group.id}`);
+      // socket.to(`GROUP:${eachGroup.group.id}`).emit(GROUP_ACTION.GROUP_JOIN,{message : `User ${socket.user.name} has connected`, user : socket.user});
+      // console.log('Group ID Join : ',eachGroup.group.id);
+    }
+    socket.broadcast.emit(GROUP_ACTION.GROUP_JOIN,{message : `User ${socket.user.name} has connected`, user : socket.user});
+
     next();
   } catch (error) {
     console.log(error);

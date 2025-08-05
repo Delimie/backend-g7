@@ -3,7 +3,7 @@ import { CHAT_ACTION, CHAT_EVENT, NOTI_ACTION, STATUS } from "../../shared/const
 import { userDeleteMessage, userEditMessage, userSendMessage, userTyping } from "../socket-events/chat.event.js";
 
 export const chatHandler = (io, socket) => {
-
+  
   // Listen to user typing status
   socket.on(CHAT_ACTION.CHAT_TYPING, (data, callback) => userTyping(io, socket, data, callback));
 
