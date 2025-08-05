@@ -109,6 +109,7 @@ export const getUsersInGroup = async (groupId) => {
           name: true,
           email: true,
           profileImage: true,
+          qrCode: true,
           onlineStatus: true,
         }
       }
@@ -120,6 +121,7 @@ export const getUsersInGroup = async (groupId) => {
     name: m.user.name,
     email: m.user.email,
     profileImage: m.user.profileImage,
+    qrCode: m.user.qrCode,
     role: m.role,
     onlineStatus : m.user.onlineStatus,
   }))
