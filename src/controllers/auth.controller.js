@@ -2,6 +2,7 @@ import prisma from "../config/prisma.config.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import createError from "../utils/create-error.js";
+import { OAuth2Client } from "google-auth-library";
 
 export const register = async (req, res, next) => {
   try {
@@ -114,3 +115,54 @@ export const resetPassword = async (req, res, next) => {
     next(error)
   }
 }
+
+export const loginGoogle = async (req, res, next) => {
+  const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+  try {
+    const { idToken } = req.body;
+    if (!idToken) createError(400, "Missing Google ID token");
+
+    // 1. ตรวจสอบ token จาก Google
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+    const payload = ticket.getPayload();
+
+    const { email, name, picture } = payload;
+    console.log(payload)
+    if (!email || !name) createError(400, "Invalid Google token");
+
+    // 2. ตรวจสอบว่ามีผู้ใช้ในระบบแล้วหรือยัง
+    let existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      const token = jwt.sign({ id: existingUser.id }, process.env.SECRET, {
+        algorithm: "HS256",
+        expiresIn: "30d"
+      });
+      const { password, ...userData } = existingUser;
+      return res.json({ message: "Login successful", token, user: userData });
+    }
+
+    // 3. ถ้ายังไม่มี user, สร้างใหม่
+    const newUser = await prisma.user.create({
+      data: {
+        email,
+        name,
+        profileImage: picture || undefined,
+        // ไม่ต้องใส่ password
+      },
+    });
+
+    const token = jwt.sign({ id: newUser.id }, process.env.SECRET, {
+      algorithm: "HS256",
+      expiresIn: "30d"
+    });
+
+    const { password, ...userData } = newUser;
+    res.json({ message: "Register successful", token, user: userData });
+
+  } catch (error) {
+    next(error);
+  }
+};
