@@ -53,6 +53,8 @@ export const socketMiddleware = async (socket, next) => {
       // socket.to(`GROUP:${eachGroup.group.id}`).emit(GROUP_ACTION.GROUP_JOIN,{message : `User ${socket.user.name} has connected`, user : socket.user});
       // console.log('Group ID Join : ',eachGroup.group.id);
     }
+
+    // Broadcast to all online user
     socket.broadcast.emit(GROUP_ACTION.GROUP_JOIN,{message : `User ${socket.user.name} has connected`, user : socket.user});
 
     next();
