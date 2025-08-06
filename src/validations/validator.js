@@ -18,10 +18,35 @@ export const registerSchema = object({
   confirmPassword: string().oneOf([ref("password")], 'confirmPassword must match password'),
   email: string().email(),
   mobile: string().matches(thaiMobileRegex, 'Invalid Mobile'),
-  birthDate: date().required('Enter your birth date').max(new Date(), 'Birth date must not be in the future'),
-  gender: string().oneOf(['men', 'women', 'others'], 'Gender must be either "men" or "women" or "others"'),
-  occupation: string().required('Enter your occupation'),
-  address: string().required('Enter your province')
+  // birthDate: date().required('Enter your birth date').max(new Date(), 'Birth date must not be in the future'),
+  // gender: string().oneOf(['men', 'women', 'others'], 'Gender must be either "men" or "women" or "others"'),
+  // occupation: string().required('Enter your occupation'),
+  // address: string().required('Enter your province')
+  birthDate: date()
+    .max(new Date(), 'Birth date must not be in the future')
+    .when('$isGoogle', {
+      is: true,
+      then: schema => schema.optional(),
+      otherwise: schema => schema.required('Enter your birth date'),
+    }),
+  gender: string().oneOf(['men', 'women', 'others'], 'Invalid gender')
+    .when('$isGoogle', {
+      is: true,
+      then: schema => schema.optional(),
+      otherwise: schema => schema.required('Select your gender'),
+    }),
+  occupation: string()
+    .when('$isGoogle', {
+      is: true,
+      then: schema => schema.optional(),
+      otherwise: schema => schema.required('Enter your occupation'),
+    }),
+  address: string()
+    .when('$isGoogle', {
+      is: true,
+      then: schema => schema.optional(),
+      otherwise: schema => schema.required('Enter your province'),
+    }),
 }).noUnknown()
   .transform((value) => {
     if (value.email || value.mobile) {
@@ -57,6 +82,10 @@ export const loginSchema = object({
     return value
   }
   return ({ ...value, [emailRegex.test(value.identity) ? 'email' : 'mobile']: value.identity })
+}).noUnknown()
+
+export const googleLoginSchema = object({
+  idToken: string().required('Google ID token is required')
 }).noUnknown()
 
 export const validate = (schema, option = {}) => {
