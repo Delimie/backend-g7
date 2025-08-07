@@ -64,6 +64,12 @@ export const debtSummary = async (req, res, next) => {
       if (creditor.amount === 0) creditors.shift()
     }
 
+    await prisma.debtTransaction.deleteMany({
+      where: {
+        groupId: Number(groupId)
+      }
+    })
+
     const created = await prisma.debtTransaction.createMany({
       data: summary
     })
@@ -146,3 +152,28 @@ export const confirmTransaction = async (req, res, next) => {
     next(error)
   }
 }
+
+export const uploadSlipController = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const updated = await prisma.debtTransaction.update({
+      where: { id: Number(id) },
+      data: {
+        slip: req.file.filename,
+        updatedAt: new Date()
+      }
+    });
+
+    return res.status(200).json({
+      message: "Slip uploaded and saved successfully",
+      result: updated
+    });
+  } catch (error) {
+    next(error);
+  }
+};
