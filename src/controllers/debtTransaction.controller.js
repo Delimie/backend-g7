@@ -2,7 +2,15 @@ import prisma from "../config/prisma.config.js";
 
 export const debtSummary = async (req, res, next) => {
   try {
-    const { groupId } = req.params
+    const { groupId } = req.params;
+
+    // ดึงสมาชิกกลุ่มจริง ๆ มาเก็บไว้
+    const groupUsers = await prisma.groupUser.findMany({
+      where: { groupId: Number(groupId) },
+      select: { userId: true }
+    });
+    const groupUserIds = groupUsers.map(gu => gu.userId);
+
     const splits = await prisma.expenseSplit.findMany({
       where: {
         expense: { groupUser: { groupId: Number(groupId) } }
@@ -18,67 +26,83 @@ export const debtSummary = async (req, res, next) => {
         },
         user: true
       }
-    })
-    console.log(splits)
+    });
 
-    const net = {}
+    const net = {};
 
     for (const split of splits) {
-      console.log(split)
-      const paidBy = split.expense.groupUser.userId
-      const paidFor = split.userId
-      const amount = split.amount
+      const paidBy = split.expense.groupUser.userId;
+      const paidFor = split.userId;
+      const amount = split.amount;
 
-      if (paidBy === paidFor) continue
+      if (paidBy === paidFor) continue;
 
-      net[paidFor] = (net[paidFor] || 0) - amount
-      net[paidBy] = (net[paidBy] || 0) + amount
+      net[paidFor] = (net[paidFor] || 0) - amount;
+      net[paidBy] = (net[paidBy] || 0) + amount;
     }
-    const summary = []
+
+    const summary = [];
     const debtors = Object.entries(net)
       .filter(([_, v]) => v < 0)
-      .map(([id, amount]) => ({ id: Number(id), amount: -amount }))
+      .map(([id, amount]) => ({ id: Number(id), amount: -amount }));
     const creditors = Object.entries(net)
       .filter(([_, v]) => v > 0)
-      .map(([id, amount]) => ({ id: Number(id), amount: amount }))
+      .map(([id, amount]) => ({ id: Number(id), amount: amount }));
 
     while (debtors.length && creditors.length) {
-      const debtor = debtors[0]
-      const creditor = creditors[0]
-      const amount = Math.min(debtor.amount, creditor.amount)
+      const debtor = debtors[0];
+      const creditor = creditors[0];
+      const amount = Math.min(debtor.amount, creditor.amount);
 
       summary.push({
         payerId: debtor.id,
         receiverId: creditor.id,
         groupId: Number(groupId),
-        // identity: "INPROGRESS",
         amount,
         status: "INPROGRESS",
         isConfirmed: false
-      })
+      });
 
-      debtor.amount -= amount
-      creditor.amount -= amount
+      debtor.amount -= amount;
+      creditor.amount -= amount;
 
-      if (debtor.amount === 0) debtors.shift()
-      if (creditor.amount === 0) creditors.shift()
+      if (debtor.amount === 0) debtors.shift();
+      if (creditor.amount === 0) creditors.shift();
     }
 
-    await prisma.debtTransaction.deleteMany({
-      where: {
-        groupId: Number(groupId)
-      }
-    })
+    for (const item of summary) {
+      const created = await prisma.debtTransaction.create({ data: item });
 
-    const created = await prisma.debtTransaction.createMany({
-      data: summary
-    })
-    console.log(created)
-    res.json({ result: summary })
+      const allSplits = await prisma.expenseSplit.findMany({
+        where: {
+          userId: item.payerId,
+          debtTransactionId: null
+        }
+      });
+
+      const matchedSplits = allSplits.filter(split => {
+        // เช็คว่า payer และ receiver อยู่ในกลุ่ม
+        if (!groupUserIds.includes(item.payerId)) return false;
+        if (!groupUserIds.includes(item.receiverId)) return false;
+
+        return split.userId === item.payerId && !split.debtTransactionId;
+      });
+
+      await Promise.all(
+        matchedSplits.map(split =>
+          prisma.expenseSplit.update({
+            where: { id: split.id },
+            data: { debtTransactionId: created.id }
+          })
+        )
+      );
+    }
+
+    res.json({ result: summary });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 
 // export const createDebtTransactions = async (req, res, next) => {
 //   try {
@@ -104,20 +128,29 @@ export const debtSummary = async (req, res, next) => {
 
 export const updateDebtTransaction = async (req, res, next) => {
   try {
-    const { id } = req.params
-    const { slip, note } = req.body
+    const { id } = req.params;
+    const { slip, note } = req.body;
+
+    const existing = await prisma.debtTransaction.findUnique({
+      where: { id: Number(id) }
+    });
+    if (!existing) return res.status(404).json({ message: "Transaction not found" });
+
     const updated = await prisma.debtTransaction.update({
       where: { id: Number(id) },
       data: {
-        slip: slip,
-        note: note
+        slip,
+        note,
+        updatedAt: new Date()
       }
-    })
-    res.json({ result: updated })
+    });
+
+    res.json({ result: updated });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
+
 
 export const getTransactions = async (req, res, next) => {
   try {
@@ -145,8 +178,19 @@ export const confirmTransaction = async (req, res, next) => {
         isConfirmed: true,
         status: "COMPLETE",
         updatedAt: new Date()
+      },
+      include: {
+        expenseSplit: true
       }
     })
+    await prisma.expenseSplit.updateMany({
+      where: {
+        debtTransactionId: updated.id
+      },
+      data: {
+        status: "PAID"
+      }
+    });
     res.json({ result: updated })
   } catch (error) {
     next(error)
