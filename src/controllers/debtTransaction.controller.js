@@ -4,7 +4,6 @@ export const debtSummary = async (req, res, next) => {
   try {
     const { groupId } = req.params;
 
-    // ดึงสมาชิกกลุ่มจริง ๆ มาเก็บไว้
     const groupUsers = await prisma.groupUser.findMany({
       where: { groupId: Number(groupId) },
       select: { userId: true }
@@ -24,12 +23,12 @@ export const debtSummary = async (req, res, next) => {
             }
           }
         },
-        user: true
+        user: true,
+        debtTransaction: true
       }
     });
 
     const net = {};
-
     for (const split of splits) {
       const paidBy = split.expense.groupUser.userId;
       const paidFor = split.userId;
@@ -71,32 +70,47 @@ export const debtSummary = async (req, res, next) => {
     }
 
     for (const item of summary) {
-      const created = await prisma.debtTransaction.create({ data: item });
-
-      const allSplits = await prisma.expenseSplit.findMany({
+      let created = await prisma.debtTransaction.findFirst({
         where: {
-          userId: item.payerId,
-          debtTransactionId: null
+          payerId: item.payerId,
+          receiverId: item.receiverId,
+          groupId: item.groupId,
+          amount: item.amount,
+          status: "INPROGRESS",
+          isConfirmed: false
         }
       });
 
-      const matchedSplits = allSplits.filter(split => {
-        // เช็คว่า payer และ receiver อยู่ในกลุ่ม
-        if (!groupUserIds.includes(item.payerId)) return false;
-        if (!groupUserIds.includes(item.receiverId)) return false;
+      if (!created) {
+        created = await prisma.debtTransaction.create({ data: item });
+      }
 
-        return split.userId === item.payerId && !split.debtTransactionId;
+      // ผูก expenseSplit ที่ยังไม่มี debtTransactionId กับ transaction ที่สร้าง
+      const splitsToUpdate = await prisma.expenseSplit.findMany({
+        where: {
+          debtTransactionId: null,
+          userId: item.payerId,
+          expense: {
+            groupUser: {
+              groupId: Number(groupId),
+              userId: item.receiverId
+            }
+          }
+        },
       });
 
       await Promise.all(
-        matchedSplits.map(split =>
+        splitsToUpdate.map((split) =>
           prisma.expenseSplit.update({
             where: { id: split.id },
-            data: { debtTransactionId: created.id }
+            data: { debtTransactionId: created.id, status: 'PAID' },
           })
         )
       );
     }
+
+    // ลบการอัปเดต split เป็น PAID แบบ mass update ในนี้ออก
+    // การอัปเดต status ควรไปทำใน confirmTransaction หรือ uploadSlipController แทน
 
     res.json({ result: summary });
   } catch (error) {
@@ -197,27 +211,183 @@ export const confirmTransaction = async (req, res, next) => {
   }
 }
 
-export const uploadSlipController = async (req, res, next) => {
-  try {
-    const { id } = req.params;
+// export const uploadSlipController = async (req, res) => {
+//   try {
+//     const transactionId = Number(req.params.id);
 
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
+//     const currentTransaction = await prisma.debtTransaction.findUnique({
+//       where: { id: transactionId },
+//     });
+//     if (!currentTransaction) {
+//       return res.status(404).json({ message: "Transaction not found" });
+//     }
+//     const { payerId, receiverId, groupId } = currentTransaction;
+
+//     // อัปเดต slip และสถานะ transaction ปัจจุบัน
+//     await prisma.debtTransaction.update({
+//       where: { id: transactionId },
+//       data: {
+//         slip: req.file?.path || null,
+//         status: "COMPLETE",
+//         isConfirmed: true,
+//         updatedAt: new Date()
+//       },
+//     });
+
+//     // อัปเดต expenseSplit ของ transaction ปัจจุบัน ให้เป็น PAID
+//     const updatedCurrentSplits = await prisma.expenseSplit.updateMany({
+//       where: { debtTransactionId: transactionId },
+//       data: { status: "PAID" }
+//     });
+//     console.log("Updated expenseSplits for current transaction:", updatedCurrentSplits.count);
+
+//     // อัปเดต expenseSplit ของ payerId ที่ยังไม่มี debtTransactionId และ status เป็น UNPAID
+//     const updatedPayerSplits = await prisma.expenseSplit.updateMany({
+//       where: {
+//         userId: payerId,
+//         debtTransactionId: null,
+//         status: 'UNPAID',
+//         expense: {
+//           groupUser: {
+//             groupId
+//           }
+//         }
+//       },
+//       data: {
+//         status: 'PAID'
+//       }
+//     });
+//     console.log("Updated expenseSplits for payerId with no debtTransactionId:", updatedPayerSplits.count);
+
+//     // หา transaction อื่น ๆ คู่หนี้เดียวกัน (payer-receiver หรือ receiver-payer) ที่ยังไม่จ่าย
+//     const relatedTransactions = await prisma.debtTransaction.findMany({
+//       where: {
+//         groupId,
+//         status: { not: "COMPLETE" },
+//         OR: [
+//           { payerId, receiverId },
+//           { payerId: receiverId, receiverId: payerId },
+//         ],
+//       },
+//       select: { id: true },
+//     });
+//     console.log("Related splits count:", relatedSplits.length);
+
+//     const relatedTransactionIds = relatedTransactions.map(t => t.id);
+
+//     if (relatedTransactionIds.length > 0) {
+//       // อัปเดตสถานะ transaction เหล่านั้นให้เป็น COMPLETE
+//       const updatedTransactions = await prisma.debtTransaction.updateMany({
+//         where: { id: { in: relatedTransactionIds } },
+//         data: { status: "COMPLETE" }
+//       });
+//       console.log("Updated related debtTransactions:", updatedTransactions.count);
+
+//       // อัปเดต expenseSplit ที่เชื่อมกับ transaction เหล่านั้น ให้เป็น PAID
+//       const updatedRelatedSplits = await prisma.expenseSplit.updateMany({
+//         where: { debtTransactionId: { in: relatedTransactionIds } },
+//         data: { status: "PAID" }
+//       });
+//       console.log("Updated expenseSplits for related transactions:", updatedRelatedSplits.count);
+//     }
+
+//     // เพิ่มอัปเดต expenseSplit ของ payerId และ receiverId ที่ยังไม่เป็น PAID ในกลุ่มเดียวกัน
+//     const updatedUserSplits = await prisma.expenseSplit.updateMany({
+//       where: {
+//         status: { not: 'PAID' },
+//         userId: { in: [payerId, receiverId] },
+//         expense: {
+//           groupUser: {
+//             groupId
+//           }
+//         }
+//       },
+//       data: {
+//         status: 'PAID'
+//       }
+//     });
+//     console.log("Updated expenseSplits for payerId and receiverId in group:", updatedUserSplits.count);
+
+//     return res.json({
+//       message: "Slip uploaded and all related debts marked as PAID",
+//     });
+//   } catch (err) {
+//     console.error("Upload slip error:", err);
+//     return res.status(500).json({ message: "Upload failed", error: err.message });
+//   }
+// };
+
+export const uploadSlipController = async (req, res) => {
+  try {
+    const transactionId = Number(req.params.id);
+
+    const currentTransaction = await prisma.debtTransaction.findUnique({
+      where: { id: transactionId },
+    });
+    if (!currentTransaction) {
+      return res.status(404).json({ message: "Transaction not found" });
     }
 
-    const updated = await prisma.debtTransaction.update({
-      where: { id: Number(id) },
+    const { payerId, receiverId, groupId } = currentTransaction;
+
+    // อัปเดต slip และสถานะ transaction ปัจจุบัน
+    await prisma.debtTransaction.update({
+      where: { id: transactionId },
       data: {
-        slip: req.file.filename,
+        slip: req.file?.path || null,
+        status: "COMPLETE",
+        isConfirmed: true,
         updatedAt: new Date()
-      }
+      },
+    });
+    const splitsBefore = await prisma.expenseSplit.findMany({
+      where: { debtTransactionId: transactionId }
+    });
+    console.log("Before update:", splitsBefore);
+
+    // 1. อัปเดต expenseSplit ที่ผูกกับ transaction นี้
+    const updatedSplitsWithTx = await prisma.expenseSplit.updateMany({
+      where: { debtTransactionId: transactionId },
+      data: { status: "PAID" }
     });
 
-    return res.status(200).json({
-      message: "Slip uploaded and saved successfully",
-      result: updated
+    // 2. อัปเดต expenseSplit ที่ยังไม่มี debtTransactionId
+    const updatedSplitsWithoutTx = await prisma.expenseSplit.updateMany({
+      where: {
+        debtTransactionId: null,
+        status: { not: "PAID" },
+        userId: { in: [payerId, receiverId] },
+        expense: {
+          groupUser: {
+            groupId
+          }
+        }
+      },
+      data: { status: "PAID" }
     });
-  } catch (error) {
-    next(error);
+
+    // *** เพิ่มเติม: อัปเดต expenseSplit ที่อาจมี debtTransactionId อื่นแต่ยังไม่ PAID ***
+    await prisma.expenseSplit.updateMany({
+      where: {
+        debtTransactionId: { not: null },
+        status: { not: "PAID" },
+        userId: { in: [payerId, receiverId] },
+        expense: {
+          groupUser: {
+            groupId
+          }
+        }
+      },
+      data: { status: "PAID" }
+    });
+
+    return res.json({
+      message: "Slip uploaded and all related debts marked as PAID",
+      updatedSplitsWithTx: updatedSplitsWithTx.count,
+      updatedSplitsWithoutTx: updatedSplitsWithoutTx.count,
+    });
+  } catch (err) {
+    console.error("Upload slip error:", err);
+    return res.status(500).json({ message: "Upload failed", error: err.message });
   }
 };

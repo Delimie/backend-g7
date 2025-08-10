@@ -8,7 +8,7 @@ debtTransactionRouter.get('/groups/:groupId/debt-summary', debtSummary)
 debtTransactionRouter.post('/:id', updateDebtTransaction)
 debtTransactionRouter.get('/groups/:groupId/transactions', getTransactions)
 debtTransactionRouter.patch('/debt-transactions/:id/confirm', confirmTransaction)
-debtTransactionRouter.post("/transactions/:id/upload-slip", uploadSlip, uploadSlipController);
+debtTransactionRouter.patch("/transactions/:id/upload-slip", uploadSlip, uploadSlipController);
 
 
 export default debtTransactionRouter;
