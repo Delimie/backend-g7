@@ -16,7 +16,7 @@ export const createExpense = async (data) => {
     createError(404, 'Group not found')
   }
 
-  const groupUser = await prisma.groupUser.findFirst({ 
+  const groupUser = await prisma.groupUser.findFirst({
     where: { groupId, userId }
   })
   if (!groupUser) {
@@ -25,12 +25,12 @@ export const createExpense = async (data) => {
 
   const expense = await prisma.expense.create({
     data: {
-    title,
-    amount,
-    receiptImage,
-    date: date ? new Date(date) : new Date(),
-    groupUserId: groupUser.id
-  },
+      title,
+      amount,
+      receiptImage,
+      date: date ? new Date(date) : new Date(),
+      groupUserId: groupUser.id
+    },
     include: {
       groupUser: {
         include: {
@@ -130,9 +130,20 @@ export const updateExpense = async (id, data) => {
             select: {
               id: true,
               name: true,
-            }
+            },
           },
-          debtTransaction: true,
+          debtTransaction: {
+            select: {
+              id: true,
+              amount: true,
+              status: true,
+              payerId: true,
+              receiverId: true,
+              slip: true,
+              createdAt: true,
+              updatedAt: true,
+            }
+          }
         }
       }
     }
@@ -158,7 +169,6 @@ export const deleteExpense = async (id) => {
 }
 
 export const getExpensesByGroupId = async (groupId) => {
-
   if (!groupId || isNaN(groupId)) {
     createError(404, 'Invalid group ID')
   }
@@ -195,7 +205,18 @@ export const getExpensesByGroupId = async (groupId) => {
               name: true
             }
           },
-          debtTransaction: true
+          debtTransaction: {
+            select: {
+              id: true,
+              amount: true,
+              status: true,
+              payerId: true,
+              receiverId: true,
+              slip: true,
+              createdAt: true,
+              updatedAt: true,
+            }
+          }
         }
       }
     }
@@ -203,3 +224,4 @@ export const getExpensesByGroupId = async (groupId) => {
 
   return expenses
 }
+
